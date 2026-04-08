@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fifi-Filler</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap');
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #1e1e2e;
+      --accent: #d802df;
+      --accent-glow: rgba(223, 2, 186, 0.25);
+      --success: #00c37d;
+      --text: #e8e8f0;
+      --muted: #6b6b8a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 360px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #000000 0%, #cb0098 100%);
+      padding: 14px 18px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+    }
+    .header-icon { font-size: 22px; }
+    .header-text h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px; font-weight: 800;
+      letter-spacing: -0.3px; color: #fff;
+    }
+    .header-text p { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+
+    /* ── Profile Switcher ── */
+    .profile-switcher {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .profile-switcher-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .profile-tabs {
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      flex: 1;
+    }
+    .profile-btn {
+      flex: 1;
+      padding: 5px 0;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 11px; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      letter-spacing: 0.3px;
+    }
+    .profile-btn:first-child { border-right: 1px solid var(--border); }
+    .profile-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    .profile-btn:not(.active):hover { color: var(--text); }
+    .profile-active-label {
+      font-size: 11px;
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      flex-shrink: 0;
+      min-width: 52px;
+      text-align: right;
+    }
+
+    /* ── Body ── */
+    .body { padding: 14px 16px; }
+
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--muted);
+      margin: 10px 0 7px;
+    }
+
+    /* ── Field groups ── */
+    .field-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border);
+      gap: 8px;
+    }
+    .field:last-child { border-bottom: none; }
+
+    .field-icon { font-size: 13px; color: var(--muted); width: 18px; text-align: center; flex-shrink: 0; }
+
+    .field-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0;
+    }
+    .field-label { font-size: 10px; color: var(--muted); letter-spacing: 0.3px; margin-bottom: 2px; }
+
+    .field-content input,
+    .field-content select {
+      background: transparent;
+      border: none; outline: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      width: 100%;
+    }
+    .field-content input::placeholder { color: #3a3a55; }
+    .field-content select option { background: #13131a; }
+
+    /* Password toggle */
+    .field-pw {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .field-pw input { flex: 1; }
+    .pw-toggle {
+      background: none; border: none;
+      cursor: pointer; padding: 2px 4px;
+      color: var(--muted); font-size: 13px;
+      line-height: 1; transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .pw-toggle:hover { color: var(--text); }
+
+    .field-pair {
+      display: flex;
+      gap: 10px;
+    }
+    .field-pair input { flex: 1; }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 10px; border: none;
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.3px;
+      transition: all 0.15s ease;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: #0358c2;
+      box-shadow: 0 0 28px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: var(--surface); color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: #2e2e45; }
+
+    /* ── Options ── */
+    .options-group {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+    }
+    .option-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+    }
+    .option-row:last-child { border-bottom: none; }
+    .option-label { font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 7px; }
+    .option-label span { color: var(--muted); font-size: 13px; }
+
+    /* ── Toggle ── */
+    .toggle { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
+    .toggle input { display: none; }
+    .toggle-track { width: 100%; height: 100%; background: var(--border); border-radius: 9px; cursor: pointer; transition: background 0.2s; }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px;
+      background: #fff; border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
+    /* ── Status ── */
+    .status-bar {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11.5px; color: var(--muted);
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+    .status-dot.active { background: var(--success); box-shadow: 0 0 6px rgba(0,195,125,0.5); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    /* ── Flash ── */
+    .flash {
+      position: fixed; bottom: 14px; left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: var(--success); color: #fff;
+      font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+      padding: 8px 18px; border-radius: 99px;
+      opacity: 0; transition: all 0.25s ease;
+      white-space: nowrap; pointer-events: none; z-index: 100;
+    }
+    .flash.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-icon">📋</div>
+    <div class="header-text">
+      <h1>Fifi-Filler · Assistente de formulário</h1>
+      <p>by: Raphael - made with ❤️</p>
+    </div>
+  </div>
+
+  <!-- ── PROFILE SWITCHER ── -->
+  <div class="profile-switcher">
+    <span class="profile-switcher-label">Perfil</span>
+    <div class="profile-tabs">
+      <button class="profile-btn active" data-profile="1">Perfil 1</button>
+      <button class="profile-btn" data-profile="2">Perfil 2</button>
+    </div>
+    <span class="profile-active-label" id="profileLabel">Perfil 1</span>
+  </div>
+
+  <div class="body">
+
+    <!-- ── PERSONAL DATA ── -->
+    <div class="section-label">Dados Pessoais</div>
+    <div class="field-group">
+      <div class="field">
+        <div class="field-icon">👤</div>
+        <div class="field-content">
+          <div class="field-label">Nome</div>
+          <input id="firstName" type="text" placeholder="João" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">👤</div>
+        <div class="field-content">
+          <div class="field-label">Sobrenome</div>
+          <input id="lastName" type="text" placeholder="Silva" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">🪪</div>
+        <div class="field-content">
+          <div class="field-label">CPF</div>
+          <input id="cpf" type="text" placeholder="000.000.000-00" maxlength="14" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">🎂</div>
+        <div class="field-content">
+          <div class="field-label">Data de Nascimento</div>
+          <input id="dateOfBirth" type="text" placeholder="DD/MM/AAAA" maxlength="10" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">✉️</div>
+        <div class="field-content">
+          <div class="field-label">E-mail</div>
+          <input id="email" type="email" placeholder="joao@email.com" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">📱</div>
+        <div class="field-content">
+          <div class="field-label">Telefone</div>
+          <input id="phone" type="tel" placeholder="+55 11 99999-0000" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">🔒</div>
+        <div class="field-content">
+          <div class="field-label">Senha</div>
+          <div class="field-pw">
+            <input id="password" type="password" placeholder="••••••••" autocomplete="off" />
+            <button class="pw-toggle" id="pwToggle" title="Mostrar/ocultar senha">👁️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STUDENT FIELDS ── -->
+    <div class="section-label">Meia-Entrada Estudante</div>
+    <div class="field-group">
+      <div class="field">
+        <div class="field-icon">🎓</div>
+        <div class="field-content">
+          <div class="field-label">CIE (Carteira do Estudante)</div>
+          <input id="cie" type="text" placeholder="Número da CIE" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">📅</div>
+        <div class="field-content">
+          <div class="field-label">Data de Expiração</div>
+          <input id="validityDate" type="text" placeholder="DD/MM/AAAA" maxlength="10" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">🏫</div>
+        <div class="field-content">
+          <div class="field-label">Nome da Instituição</div>
+          <input id="institutionName" type="text" placeholder="USP, UNICAMP..." />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">📚</div>
+        <div class="field-content">
+          <div class="field-label">Curso</div>
+          <input id="course" type="text" placeholder="Engenharia, Direito..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADDRESS ── -->
+    <div class="section-label">Endereço</div>
+    <div class="field-group">
+      <div class="field">
+        <div class="field-icon">🏠</div>
+        <div class="field-content">
+          <div class="field-label">Endereço</div>
+          <input id="address" type="text" placeholder="Rua das Flores, 123" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">🏙️</div>
+        <div class="field-content">
+          <div class="field-label">Cidade</div>
+          <input id="city" type="text" placeholder="São Paulo" />
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-icon">🗺️</div>
+        <div class="field-content">
+          <div class="field-label">Estado / CEP</div>
+          <div class="field-pair">
+            <input id="state" type="text" placeholder="SP" maxlength="2" style="max-width:50px" />
+            <input id="zip" type="text" placeholder="01310-100" maxlength="9" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── OPTIONS ── -->
+    <div class="section-label">Opções</div>
+    <div class="options-group">
+      <div class="option-row">
+        <div class="option-label"><span>⚡</span> Preencher ao carregar a página</div>
+        <label class="toggle">
+          <input type="checkbox" id="autoFill" />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+      <div class="option-row">
+        <div class="option-label"><span>💾</span> Salvar perfil localmente</div>
+        <label class="toggle">
+          <input type="checkbox" id="saveProfile" checked />
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- ── ACTIONS ── -->
+    <div class="btn-row">
+      <button class="btn btn-primary" id="fillBtn">⚡ Preencher Agora</button>
+      <button class="btn btn-ghost" id="saveBtn">💾 Salvar</button>
+      <button class="btn btn-ghost" id="clearBtn">🗑️</button>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Não detectado.</span>
+    </div>
+  </div>
+
+  <div class="flash" id="flash"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
