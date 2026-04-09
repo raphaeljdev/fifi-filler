@@ -166,7 +166,7 @@ document.getElementById('fillBtn').addEventListener('click', () => {
     function handleResponse(response) {
       const count = response?.filled || 0;
       showFlash(
-        count > 0 ? `⚡ ${count} campo(s) preenchido(s)!` : '⚠️ Nenhum campo encontrado',
+        count > 0 ? `⚡ O(s) campo(s) foram preenchido(s)!` : '⚠️ Nenhum campo encontrado',
         count > 0 ? '#00c37d' : '#e09a00'
       );
     }
