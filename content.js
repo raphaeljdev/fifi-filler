@@ -1,289 +1,488 @@
-const ALL_FIELDS = [
-  'firstName','lastName','email','phone','password','address','city','state','zip',
-  'cpf','dateOfBirth','cie','validityDate','institutionName','course'
-];
+// content.js — finds form fields on the page and fills them.
+// Injected on demand (popup, shortcut, context menu) together with lib/br.js and
+// lib/fields.js; also registered per site for auto-fill (see autofill.js).
+// Exposes FF.content = { fill, scan, focusedSelector }. Never reads storage:
+// the background sends the values to use.
+(function (root) {
+  'use strict';
+  const FF = root.FF;
+  if (FF.content) return; // already injected in this frame
 
-const nativeInputSetter = Object.getOwnPropertyDescriptor(
-  window.HTMLInputElement.prototype, 'value'
-)?.set;
-const nativeSelectSetter = Object.getOwnPropertyDescriptor(
-  window.HTMLSelectElement.prototype, 'value'
-)?.set;
+  const { br, fields } = FF;
+  const THRESHOLD = 35;
+  const SKIP_TYPES = new Set(['hidden', 'submit', 'button', 'checkbox', 'radio', 'image', 'reset', 'file', 'range', 'color', 'search']);
+  const GROUP_SELECTOR = 'form, fieldset, [role="form"], dialog, [role="dialog"], section, main';
+  const autoFilled = new WeakSet();
 
-function digitsOnly(str) {
-  return String(str).replace(/\D/g, '');
-}
+  // ── DOM helpers ────────────────────────────────────────────────────────────
 
-function triggerReactEvents(el) {
-  el.dispatchEvent(new Event('input',  { bubbles: true }));
-  el.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-// ─── Fast fill para React ─────────────────────────────────────────────────────
-function fastFill(el, value) {
-  if (!el || el.disabled || el.readOnly) return false;
-
-  if (el.tagName === 'SELECT') {
-    if (nativeSelectSetter) nativeSelectSetter.call(el, value);
-    else el.value = value;
-    triggerReactEvents(el);
-    return true;
+  /** All elements in the document, including open shadow roots. */
+  function* walk(rootNode) {
+    for (const el of rootNode.querySelectorAll('*')) {
+      yield el;
+      if (el.shadowRoot) yield* walk(el.shadowRoot);
+    }
   }
 
-  el.focus();
-  el.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
-
-  if (nativeInputSetter) {
-    nativeInputSetter.call(el, '');
-    triggerReactEvents(el);
+  function isVisible(el) {
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return false;
+    const style = getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) !== 0;
   }
 
-  el.select?.();
-  document.execCommand('selectAll', false, null);
-  document.execCommand('delete', false, null);
-  document.execCommand('insertText', false, value);
-
-  triggerReactEvents(el);
-  el.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
-
-  return true;
-}
-
-// ─── Para campos mascarados (CPF, data, etc.) ────────────────────────────────
-async function maskedFill(el, value) {
-  if (!el || el.disabled || el.readOnly) return false;
-
-  const digits = digitsOnly(value);
-
-  el.focus();
-  el.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
-
-  if (nativeInputSetter) {
-    nativeInputSetter.call(el, '');
-    triggerReactEvents(el);
+  function isSearchBox(el) {
+    const n = (el.name || '').toLowerCase();
+    return el.closest('[role="search"]') !== null || n === 'q' || n === 's' || /\bsearch|busca|pesquis/i.test(el.getAttribute('aria-label') || '');
   }
 
-  el.select?.();
-  document.execCommand('selectAll', false, null);
-  document.execCommand('delete', false, null);
-
-  for (const digit of digits) {
-    document.execCommand('insertText', false, digit);
-    await new Promise(r => setTimeout(r, 12));
-  }
-
-  triggerReactEvents(el);
-  el.dispatchEvent(new FocusEvent('blur', { bubbles: true }));
-
-  return true;
-}
-
-// ─── Retorna hints descritivos de um elemento ─────────────────────────────────
-function getElementHints(el) {
-  const parts = [
-    el.name, el.id, el.placeholder,
-    el.getAttribute('aria-label'),
-    el.getAttribute('autocomplete'),
-    el.getAttribute('data-testid'),
-    el.getAttribute('data-field'),
-    el.getAttribute('data-qa'),
-    el.className,
-  ].map(a => (a || '').toLowerCase());
-
-  if (el.id) {
-    try {
-      const label = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
-      if (label) parts.push(label.textContent.toLowerCase());
-    } catch(e) {}
-  }
-
-  const parentLabel = el.closest('label');
-  if (parentLabel) parts.push(parentLabel.textContent.toLowerCase());
-
-  const parentBlock = el.closest('div, fieldset, td, li');
-  if (parentBlock) {
-    const labelEl = parentBlock.querySelector('label, [class*="label"], [class*="Label"]');
-    if (labelEl) parts.push(labelEl.textContent.toLowerCase());
-  }
-
-  return parts.join(' ');
-}
-
-// ─── Verifica se elemento está visível ───────────────────────────────────────
-function isVisible(el) {
-  if (!el) return false;
-  const rect = el.getBoundingClientRect();
-  if (rect.width === 0 && rect.height === 0) return false;
-  const style = window.getComputedStyle(el);
-  return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-}
-
-// ─── Coleta todos inputs visíveis/ativos em ordem DOM ────────────────────────
-function getAllVisibleInputs() {
-  return Array.from(document.querySelectorAll(
-    'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]):not([type="image"]), textarea, select'
-  )).filter(el => isVisible(el) && !el.disabled);
-}
-
-// ─── Divide inputs em grupos de formulário por distância vertical no DOM ─────
-// Dois inputs pertencem ao mesmo grupo se estão próximos verticalmente
-// OU se compartilham um ancestral comum dentro de 8 níveis
-function splitIntoFormGroups(inputs) {
-  if (inputs.length === 0) return [];
-
-  const groups = [];
-  let current = [inputs[0]];
-
-  for (let i = 1; i < inputs.length; i++) {
-    const prev = inputs[i - 1];
-    const curr = inputs[i];
-
-    // Checa ancestral compartilhado (até 8 níveis)
-    const shareAncestor = (() => {
-      let node = curr.parentElement;
-      for (let d = 0; d < 8; d++) {
-        if (!node) break;
-        if (node.contains(prev)) return true;
-        node = node.parentElement;
-      }
+  function isFillable(el) {
+    const tag = el.tagName;
+    if (tag === 'INPUT') {
+      if (SKIP_TYPES.has((el.type || 'text').toLowerCase())) return false;
+    } else if (tag !== 'SELECT' && tag !== 'TEXTAREA') {
       return false;
-    })();
+    }
+    return !el.disabled && !el.readOnly && isVisible(el) && !isSearchBox(el);
+  }
 
-    const prevRect = prev.getBoundingClientRect();
-    const currRect = curr.getBoundingClientRect();
-    const gap = currRect.top - prevRect.bottom;
+  function collect() {
+    return [...walk(document)].filter(isFillable);
+  }
 
-    // Separa grupo se gap vertical > 100px E sem ancestral próximo
-    if (!shareAncestor && gap > 100) {
-      groups.push(current);
-      current = [curr];
+  /** closest() that crosses shadow-root boundaries. */
+  function composedClosest(el, selector) {
+    let node = el;
+    while (node) {
+      const hit = node.closest?.(selector);
+      if (hit) return hit;
+      const rootNode = node.getRootNode();
+      node = rootNode instanceof ShadowRoot ? rootNode.host : null;
+    }
+    return null;
+  }
+
+  function deepActiveElement() {
+    let a = document.activeElement;
+    while (a?.shadowRoot?.activeElement) a = a.shadowRoot.activeElement;
+    return a;
+  }
+
+  // ── Hints ──────────────────────────────────────────────────────────────────
+
+  /** Normalizes a hint: splits camelCase and separators, strips accents. */
+  function norm(s) {
+    return br.normalize(String(s || '')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/[_\-.[\]:/()*#º°]+/g, ' '));
+  }
+
+  function textOf(node) {
+    return node ? node.textContent.replace(/\s+/g, ' ').trim().slice(0, 80) : '';
+  }
+
+  /** Describes an element as weighted text sources (name/id strongest, nearby text weakest). */
+  function hintsFor(el) {
+    const out = [];
+    const add = (text, w) => {
+      const t = norm(text);
+      if (t) out.push({ t, w });
+    };
+    add(el.name, 1);
+    add(el.id, 1);
+    for (const l of el.labels || []) add(textOf(l), 0.9);
+    add(el.getAttribute('aria-label'), 0.9);
+    const labelledBy = el.getAttribute('aria-labelledby');
+    if (labelledBy) {
+      const rootNode = el.getRootNode();
+      for (const id of labelledBy.split(/\s+/)) add(textOf(rootNode.getElementById?.(id)), 0.9);
+    }
+    add(el.placeholder, 0.75);
+    for (const a of ['data-testid', 'data-qa', 'data-cy', 'data-field', 'formcontrolname', 'ng-model', 'v-model']) add(el.getAttribute(a), 0.75);
+    add(el.title, 0.6);
+
+    if (!el.labels?.length) {
+      // Nearest container holding only this field: its label-like text.
+      let node = el.parentElement;
+      for (let depth = 0; node && depth < 3; depth++, node = node.parentElement) {
+        const fieldsInside = node.querySelectorAll('input, select, textarea').length;
+        if (fieldsInside > 1) break;
+        const lab = node.querySelector('label, legend, [class*="label" i]');
+        if (lab && !lab.contains(el)) {
+          add(textOf(lab), 0.7);
+          break;
+        }
+      }
+      const prev = el.previousElementSibling;
+      if (prev && !prev.matches('input, select, textarea')) {
+        const t = textOf(prev);
+        if (t.length <= 40) add(t, 0.6);
+      }
+    }
+    return out;
+  }
+
+  // ── Scoring & assignment ───────────────────────────────────────────────────
+
+  function score(el, rule, hints) {
+    const isPwd = el.type === 'password';
+    if (Boolean(rule.passwordOnly) !== isPwd) return 0;
+
+    let s = 0;
+    const ac = (el.getAttribute('autocomplete') || '').toLowerCase().split(/\s+/);
+    if (rule.ac?.some(t => ac.includes(t))) s = 100;
+
+    const compactIds = [el.id, el.name].map(v => br.normalize(v).replace(/[^a-z0-9]/g, '')).filter(Boolean);
+    if (rule.ids?.some(id => compactIds.includes(id))) s = Math.max(s, 85);
+
+    for (const h of hints) {
+      if (rule.neg?.test(h.t)) continue;
+      for (const p of rule.re) {
+        if (p.re.test(h.t)) s = Math.max(s, 70 * h.w * p.w);
+      }
+    }
+
+    const type = (el.type || '').toLowerCase();
+    if (rule.key === 'email' && type === 'email') s = Math.max(s, 90);
+    if (rule.key === 'phone' && type === 'tel') s = Math.max(s, 50);
+    if (type === 'email' && rule.key !== 'email') s = 0;
+    if (type === 'date' && !['dateOfBirth', 'validityDate'].includes(rule.key)) s = Math.min(s, 20);
+    return s;
+  }
+
+  function selectorFor(el) {
+    if (el.id && document.querySelectorAll(`#${CSS.escape(el.id)}`).length === 1) return `#${CSS.escape(el.id)}`;
+    if (el.name) {
+      const sel = `${el.tagName.toLowerCase()}[name="${CSS.escape(el.name)}"]`;
+      if (document.querySelectorAll(sel).length === 1) return sel;
+    }
+    const parts = [];
+    let node = el;
+    while (node && node.nodeType === 1 && node !== document.documentElement) {
+      let part = node.tagName.toLowerCase();
+      const parent = node.parentElement;
+      if (parent) {
+        const same = [...parent.children].filter(c => c.tagName === node.tagName);
+        if (same.length > 1) part += `:nth-of-type(${same.indexOf(node) + 1})`;
+      }
+      parts.unshift(part);
+      node = parent;
+    }
+    return parts.join(' > ');
+  }
+
+  /** Best rule for each element: [{el, key, score}]. */
+  function rank(elements, rules, mappings) {
+    const mapped = new Map();
+    for (const [sel, key] of Object.entries(mappings || {})) {
+      try {
+        const el = document.querySelector(sel);
+        if (el) mapped.set(el, key);
+      } catch { /* invalid selector saved earlier */ }
+    }
+    const out = [];
+    for (const el of elements) {
+      if (mapped.has(el) && rules.some(r => r.key === mapped.get(el))) {
+        out.push({ el, key: mapped.get(el), score: 1000 });
+        continue;
+      }
+      const hints = hintsFor(el);
+      let best = null;
+      for (const rule of rules) {
+        const s = score(el, rule, hints);
+        if (s >= THRESHOLD && (!best || s > best.score)) best = { el, key: rule.key, score: s };
+      }
+      if (best) out.push(best);
+    }
+    return out;
+  }
+
+  /** Greedy: one element per key (unless multi), strongest matches first. */
+  function assign(ranked, rules) {
+    const multi = new Set(rules.filter(r => r.multi).map(r => r.key));
+    const plan = new Map();
+    for (const m of [...ranked].sort((a, b) => b.score - a.score)) {
+      if (plan.has(m.key) && !multi.has(m.key)) continue;
+      if (!plan.has(m.key)) plan.set(m.key, []);
+      plan.get(m.key).push(m.el);
+    }
+    // A plain "Nome" next to a "Sobrenome" field means first name only.
+    if (plan.has('fullName') && plan.has('lastName') && !plan.has('firstName')) {
+      const el = plan.get('fullName')[0];
+      if (!hintsFor(el).some(h => /\b(?:complet|full)/.test(h.t))) {
+        plan.set('firstName', [el]);
+        plan.delete('fullName');
+      }
+    }
+    return plan;
+  }
+
+  function groupOf(el) {
+    return el.form || composedClosest(el, GROUP_SELECTOR) || document;
+  }
+
+  /** Picks the form to fill: the one holding focus, else the one with most recognized fields. */
+  function pickGroup(ranked, minFields) {
+    const groups = new Map();
+    for (const m of ranked) {
+      const g = groupOf(m.el);
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(m);
+    }
+    const active = deepActiveElement();
+    let best = null;
+    let bestScore = -1;
+    for (const members of groups.values()) {
+      const keys = new Set(members.map(m => m.key));
+      if (keys.size < minFields) continue;
+      let s = keys.size + members.filter(m => !m.el.value).length * 0.1;
+      if (active && members.some(m => m.el === active)) s += 1000;
+      if (s > bestScore) {
+        best = members;
+        bestScore = s;
+      }
+    }
+    return best;
+  }
+
+  // ── Writing values ─────────────────────────────────────────────────────────
+
+  function nativeSet(el, value) {
+    const proto = Object.getPrototypeOf(el);
+    const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+    if (setter) setter.call(el, value);
+    else el.value = value;
+    el.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true, inputType: 'insertText', data: value }));
+    el.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+  }
+
+  function clear(el) {
+    el.focus({ preventScroll: true });
+    try {
+      el.select?.();
+    } catch { /* some input types cannot be selected */ }
+    if (el.value && !document.execCommand('delete', false)) nativeSet(el, '');
+  }
+
+  /** Types like a user (keeps React/Vue state and input masks happy); falls back to the native setter. */
+  async function typeInto(el, value, masked) {
+    clear(el);
+    let ok = true;
+    if (masked) {
+      // Type digits one by one so the site's own mask formats them.
+      const typed = br.digits(value) || value;
+      for (const ch of typed) {
+        ok = document.execCommand('insertText', false, ch) && ok;
+        await new Promise(r => setTimeout(r, 8));
+      }
+      // No mask on this field: prefer the formatted value when it fits (dates need the slashes).
+      if (ok && el.value === typed && typed !== value && (el.maxLength < 0 || el.maxLength >= value.length)) {
+        clear(el);
+        ok = document.execCommand('insertText', false, value);
+      }
     } else {
-      current.push(curr);
+      ok = document.execCommand('insertText', false, value);
     }
-  }
-  if (current.length > 0) groups.push(current);
-  return groups;
-}
-
-// ─── Escolhe o grupo-alvo: o que tem mais campos de texto vazios ──────────────
-function pickTargetGroup(groups) {
-  if (!groups || groups.length === 0) return null;
-  if (groups.length === 1) return groups[0];
-
-  const scored = groups.map(group => {
-    const textInputs = group.filter(el => el.tagName !== 'SELECT' && el.type !== 'password');
-    const emptyCount = textInputs.filter(el => !el.value?.trim()).length;
-    return { group, emptyCount };
-  });
-
-  // Grupo com mais campos vazios = próximo a ser preenchido
-  scored.sort((a, b) => b.emptyCount - a.emptyCount);
-  return scored[0].group;
-}
-
-// ─── Encontra campo correto dentro de um grupo ───────────────────────────────
-function findInGroup(group, exactIds, patterns, isPassword) {
-  // 1) Exact match por id ou name
-  for (const id of exactIds) {
-    const el = group.find(el => el.id === id || el.name === id);
-    if (el) return el;
+    if (!ok || !el.value) nativeSet(el, value);
+    el.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+    el.dispatchEvent(new FocusEvent('blur', { bubbles: false }));
+    el.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
+    return Boolean(el.value);
   }
 
-  // 2) Pattern match nas hints
-  for (const el of group) {
-    if (isPassword && el.type !== 'password') continue;
-    if (!isPassword && el.type === 'password') continue;
-
-    const hints = getElementHints(el);
-    if (patterns.some(p => hints.includes(p))) return el;
+  function optionCandidates(key, value, v) {
+    if (key === 'state') return [v.state, v.stateName];
+    if (key === 'birthMonth') {
+      const i = Number(value) - 1;
+      return [value, br.MONTHS.pt[i], br.MONTHS.en[i], br.MONTHS.pt[i]?.slice(0, 3), br.MONTHS.en[i]?.slice(0, 3)];
+    }
+    return [value];
   }
 
-  return null;
-}
+  function matchOption(select, candidates) {
+    const wanted = candidates.filter(Boolean).map(br.normalize);
+    const opts = [...select.options].filter(o => !o.disabled);
+    const n = o => [br.normalize(o.value), br.normalize(o.textContent)];
+    return opts.find(o => n(o).some(x => wanted.includes(x)))
+      || opts.find(o => n(o).some(x => /^\d+$/.test(x) && wanted.some(w => /^\d+$/.test(w) && Number(w) === Number(x))))
+      || opts.find(o => wanted.some(w => w.length >= 3 && br.normalize(o.textContent).startsWith(w)));
+  }
 
-const FIELD_MAP = {
-  firstName:       { exactIds: ['firstName','first-name'],    patterns: ['firstname','first_name','nome','fname','given-name','first name'],              masked: false },
-  lastName:        { exactIds: ['lastName','last-name'],      patterns: ['lastname','last_name','sobrenome','surname','family-name','last name'],          masked: false },
-  email:           { exactIds: ['email'],                     patterns: ['email','e-mail','mail'],                                                         masked: false },
-  phone:           { exactIds: ['phone'],                     patterns: ['phone','mobile','telephone','cel','cellphone','tel','fone'],                     masked: true  },
-  address:         { exactIds: ['address'],                   patterns: ['address','street','addr','endereco','endereço'],                                 masked: false },
-  state:           { exactIds: ['state'],                     patterns: ['state','estado','province','region','uf'],                                       masked: false },
-  city:            { exactIds: ['city'],                      patterns: ['city','town','cidade','municipio','município'],                                  masked: false },
-  zip:             { exactIds: ['zip'],                       patterns: ['zip','postal','postcode','cep'],                                                  masked: false },
-  cpf:             { exactIds: ['documentNumber','cpf'],      patterns: ['cpf','document','documento','doc'],                                              masked: true  },
-  dateOfBirth:     { exactIds: ['dateOfBirth','birthdate'],   patterns: ['nascimento','birthdate','birth','date_of_birth','dob','data de nasc'],           masked: true  },
-  cie:             { exactIds: ['CIE','cie'],                 patterns: ['cie','student id','id estudante','carteira estudantil'],                         masked: false },
-  validityDate:    { exactIds: ['validityDate'],              patterns: ['validade','expiracao','expiração','expiry','validity','data de expira'],          masked: true  },
-  institutionName: { exactIds: ['institutionName'],           patterns: ['instituicao','instituição','institution','escola','universidade','faculdade','nome da inst'], masked: false },
-  course:          { exactIds: ['course'],                    patterns: ['curso','course','degree'],                                                       masked: false },
-  password:        { exactIds: ['password'],                  patterns: ['password','senha','pass','pwd','passwd'],                                        masked: false, type: 'password' },
-};
-
-// state DEVE vir antes de city (o select de estado popula as opções de cidade)
-const FILL_ORDER = [
-  'firstName','lastName','email','phone','password',
-  'address','state','city','zip',
-  'cpf','dateOfBirth','cie','validityDate','institutionName','course'
-];
-
-async function fillForms(profile) {
-  let filled = 0;
-
-  const allInputs = getAllVisibleInputs();
-  const groups = splitIntoFormGroups(allInputs);
-  let targetGroup = pickTargetGroup(groups);
-
-  if (!targetGroup || targetGroup.length === 0) return 0;
-
-  let stateWasFilled = false;
-
-  for (const key of FILL_ORDER) {
-    const config = FIELD_MAP[key];
-    if (!config) continue;
-
-    const value = profile[key];
-    if (!value) continue;
-
-    // Após preencher state, aguarda React re-renderizar as opções de cidade
-    if (key === 'city' && stateWasFilled) {
-      await new Promise(r => setTimeout(r, 400));
-      // Re-detecta grupo pois o DOM pode ter mudado
-      const freshGroups = splitIntoFormGroups(getAllVisibleInputs());
-      targetGroup = pickTargetGroup(freshGroups) || targetGroup;
+  /** Dependent selects (city after state) get their options asynchronously: wait a little. */
+  async function waitForOption(select, candidates, timeout = 1500) {
+    const end = Date.now() + timeout;
+    let opt = matchOption(select, candidates);
+    while (!opt && Date.now() < end) {
+      await new Promise(r => setTimeout(r, 100));
+      opt = matchOption(select, candidates);
     }
+    return opt;
+  }
 
-    const el = findInGroup(targetGroup, config.exactIds, config.patterns, config.type === 'password');
-    if (!el) continue;
-
-    let ok;
-    if (config.masked) {
-      ok = await maskedFill(el, value);
-    } else {
-      ok = fastFill(el, value);
-    }
-
-    if (ok) {
-      filled++;
-      if (key === 'state') stateWasFilled = true;
+  /** The value a given element should receive for a key, adapted to the form layout. */
+  function valueFor(key, el, v, plan) {
+    const type = (el.type || '').toLowerCase();
+    switch (key) {
+      case 'phone': return plan.has('phoneDdd') ? v.phoneLocal : v.phone;
+      case 'street': return plan.has('number') ? v.street : v.addressLine;
+      case 'dateOfBirth': return type === 'date' ? v.dateOfBirthISO : v.dateOfBirth;
+      case 'validityDate': return type === 'date' ? v.validityDateISO : v.validityDate;
+      default: return v[key];
     }
   }
 
-  return filled;
-}
-
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-  if (msg.action === 'fillForms') {
-    fillForms(msg.profile).then(count => sendResponse({ filled: count }));
-    return true;
+  async function writeValue(el, key, value, rule, v) {
+    if (el.tagName === 'SELECT') {
+      const opt = await waitForOption(el, optionCandidates(key, value, v));
+      if (!opt) return false;
+      el.focus({ preventScroll: true });
+      nativeSet(el, opt.value);
+      return true;
+    }
+    if (['date', 'month', 'number'].includes(el.type)) {
+      nativeSet(el, value);
+      return el.value !== '';
+    }
+    return typeInto(el, value, rule.masked);
   }
-  return true;
-});
 
-chrome.storage.local.get(['autoFill', ...ALL_FIELDS], (data) => {
-  if (!data.autoFill) return;
-  setTimeout(() => {
-    const profile = {};
-    ALL_FIELDS.forEach(k => profile[k] = data[k] || '');
-    fillForms(profile);
-  }, 1500);
-});
+  function highlight(el) {
+    const prev = { outline: el.style.outline, outlineOffset: el.style.outlineOffset, transition: el.style.transition };
+    el.style.transition = 'outline-color .4s';
+    el.style.outline = '2px solid #16a34a';
+    el.style.outlineOffset = '1px';
+    setTimeout(() => Object.assign(el.style, prev), 1800);
+  }
+
+  /** A visible disabled field or an option-less select suggests part of the form is still loading. */
+  function looksLoading() {
+    for (const el of walk(document)) {
+      if (!['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName) || !isVisible(el)) continue;
+      if (el.disabled || (el.tagName === 'SELECT' && el.options.length <= 1)) return true;
+    }
+    return false;
+  }
+
+  /** Waits until the DOM stops changing (or max ms). */
+  function settle(quiet = 150, max = 1200) {
+    return new Promise(resolve => {
+      let t;
+      const obs = new MutationObserver(() => {
+        clearTimeout(t);
+        t = setTimeout(done, quiet);
+      });
+      const hard = setTimeout(done, max);
+      function done() {
+        obs.disconnect();
+        clearTimeout(t);
+        clearTimeout(hard);
+        resolve();
+      }
+      obs.observe(document.documentElement, { subtree: true, childList: true, attributes: true });
+      t = setTimeout(done, quiet);
+    });
+  }
+
+  // ── Public API ─────────────────────────────────────────────────────────────
+
+  function rulesFor(payload) {
+    const custom = (payload?.custom || []).map(fields.customRule).filter(Boolean);
+    return [...fields.DETECT, ...custom];
+  }
+
+  /**
+   * Fills the best form in this frame.
+   * opts.auto: auto-fill mode — needs ≥2 recognized fields, fills empty fields only, never refills.
+   * Returns { filled: [baseKeys], missed: [baseKeys], values: {key: value} }.
+   */
+  async function fill(payload, opts = {}) {
+    const v = fields.expand(payload.values || {});
+    for (const cf of payload.custom || []) v[cf.id] = cf.value;
+
+    const allRules = rulesFor(payload);
+    const rules = allRules.filter(r => v[r.key]);
+    const ruleByKey = new Map(rules.map(r => [r.key, r]));
+    const mappings = payload.mappings?.[location.origin];
+    const order = [...fields.FILL_ORDER, ...rules.filter(r => r.custom).map(r => r.key)];
+
+    const group = pickGroup(rank(collect(), allRules, mappings), opts.auto ? 2 : 1);
+    if (!group) return { filled: [], missed: [], values: {} };
+    let plan = assign(group.filter(m => ruleByKey.has(m.key)), rules);
+
+    const filledKeys = new Set();
+    const touched = new Set();
+    const written = {};
+
+    /** Re-detects fields not yet touched; keeps earlier assignments for keys that vanished. */
+    const replan = () => {
+      const fresh = pickGroup(rank(collect(), allRules, mappings), 1);
+      if (!fresh) return;
+      const keep = plan;
+      plan = assign(fresh.filter(m => ruleByKey.has(m.key) && !touched.has(m.el)), rules);
+      for (const [k, els] of keep) if (!plan.has(k)) plan.set(k, els);
+    };
+
+    for (const [i, key] of order.entries()) {
+      if (!plan.has(key)) continue;
+      const rule = ruleByKey.get(key);
+      for (const el of plan.get(key)) {
+        if (touched.has(el)) continue;
+        touched.add(el);
+        if (opts.auto && (el.value || autoFilled.has(el))) continue;
+        const value = valueFor(key, el, v, plan);
+        if (!value) continue;
+        if (await writeValue(el, key, value, rule, v)) {
+          filledKeys.add(key);
+          written[key] = value;
+          if (opts.auto) autoFilled.add(el);
+          if (payload.highlight !== false) highlight(el);
+        }
+      }
+      // Selects and the CEP often change the rest of the form: re-detect after them.
+      // Fields still missing may be enabled/rendered a bit later (city after state): keep looking briefly.
+      if (key === 'zip' || plan.get(key).some(el => el.tagName === 'SELECT')) {
+        await settle();
+        replan();
+        const pending = order.slice(i + 1).filter(k => ruleByKey.has(k) && !plan.has(k));
+        const end = Date.now() + 1500;
+        while (pending.length && !pending.some(k => plan.has(k)) && looksLoading() && Date.now() < end) {
+          await new Promise(r => setTimeout(r, 150));
+          replan();
+        }
+      }
+    }
+
+    deepActiveElement()?.blur?.();
+    const filledBase = new Set([...filledKeys].flatMap(k => allRules.find(r => r.key === k)?.base || [k]));
+    const offered = new Set(Object.keys(payload.values || {}).filter(k => payload.values[k]));
+    for (const cf of payload.custom || []) offered.add(cf.id);
+    return {
+      filled: [...filledBase],
+      missed: [...offered].filter(k => !filledBase.has(k)),
+      values: written,
+    };
+  }
+
+  /** How many recognizable fields the best form in this frame has. */
+  function scan(payload) {
+    const rules = rulesFor(payload);
+    const ranked = rank(collect(), rules, payload?.mappings?.[location.origin]);
+    const group = pickGroup(ranked, 1) || [];
+    const active = deepActiveElement();
+    return {
+      fields: new Set(group.map(m => m.key)).size,
+      focused: Boolean(active && group.some(m => m.el === active)),
+    };
+  }
+
+  /** CSS selector for the focused field (right-clicked fields get focus), flashing it. */
+  function focusedSelector() {
+    const el = deepActiveElement();
+    if (!el || !['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName)) return null;
+    if (el.getRootNode() !== document) return null; // selectors can't reach into shadow DOM
+    highlight(el);
+    return selectorFor(el);
+  }
+
+  FF.content = { fill, scan, focusedSelector };
+})(globalThis);

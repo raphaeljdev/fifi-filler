@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><title>React</title></head>
+<body>
+  <div id="root"></div>
+  <pre id="state"></pre>
+  <script src="../../../node_modules/react/umd/react.production.min.js"></script>
+  <script src="../../../node_modules/react-dom/umd/react-dom.production.min.js"></script>
+  <script>
+    const h = React.createElement;
+    function Field({ label, name, type, state, set }) {
+      return h('label', null, label, h('input', {
+        name, type: type || 'text', value: state[name] || '',
+        onChange: e => set({ ...state, [name]: e.target.value }),
+      }));
+    }
+    function App() {
+      const [state, set] = React.useState({});
+      React.useEffect(() => { document.getElementById('state').textContent = JSON.stringify(state); }, [state]);
+      const f = (label, name, type) => h(Field, { label, name, type, state, set });
+      return h('form', null,
+        f('First name', 'firstName'), f('Last name', 'lastName'), f('Email', 'email', 'email'),
+        f('Phone', 'phone', 'tel'), f('ZIP code', 'zip'),
+        h('label', null, 'State', h('select', { name: 'state', value: state.state || '', onChange: e => set({ ...state, state: e.target.value }) },
+          h('option', { value: '' }, '--'), h('option', { value: 'SP' }, 'São Paulo'), h('option', { value: 'RJ' }, 'Rio de Janeiro'))));
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+  </script>
+</body></html>

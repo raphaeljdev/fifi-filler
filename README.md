@@ -1,287 +1,88 @@
-# 🧩 Fifi-Filler
+# Fifi-Filler
 
-> Extensão do Google Chrome que preenche automaticamente formulários de cadastro e checkout com suas informações pessoais — com suporte a dois perfis independentes.
+> Extensão do Chrome que preenche formulários de cadastro e checkout a partir dos seus perfis. Tem detecção inteligente de campos, busca de CEP, senhas criptografadas e gerador de dados de teste.
 
-![Version](https://img.shields.io/badge/versão-1.0.0-blue)
+![Version](https://img.shields.io/badge/versão-2.0.0-blue)
 ![Manifest](https://img.shields.io/badge/Manifest-v3-green)
-![Chrome](https://img.shields.io/badge/Google%20Chrome-suportado-yellow?logo=google-chrome)
+![CI](https://github.com/raphaeljdev/fifi-filler/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/licença-MIT-lightgrey)
 
----
+## Funcionalidades
 
-## 📋 Índice
-
-- [Visão Geral](#-visão-geral)
-- [Funcionalidades](#-funcionalidades)
-- [Campos Suportados](#-campos-suportados)
-- [Instalação](#-instalação)
-- [Como Usar](#-como-usar)
-- [Perfis](#-perfis)
-- [Preenchimento Automático](#-preenchimento-automático)
-- [Detecção de Formulários](#-detecção-de-formulários)
-- [Dicas e Boas Práticas](#-dicas-e-boas-práticas)
-- [FAQ](#-faq)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
-
----
-
-## 🔍 Visão Geral
-
-O **Fifi-Filler** é uma extensão local para o Google Chrome que detecta campos de formulário em qualquer site e os preenche automaticamente com as informações salvas em seu perfil. Ideal para quem precisa se cadastrar em múltiplos sites com frequência, economizando tempo e evitando erros de digitação.
-
----
-
-## ✨ Funcionalidades
-
-| Funcionalidade | Descrição |
+| | |
 |---|---|
-| ⚡ Preenchimento manual | Preenche os campos do site com um clique |
-| 🤖 Preenchimento automático | Preenche ao abrir a página automaticamente |
-| 👤 Dois perfis independentes | Alterne entre Perfil 1 e Perfil 2 |
-| 💾 Dados salvos localmente | Tudo fica no seu navegador, sem servidores externos |
-| 🔍 Detecção de formulários | Indica se a página atual possui formulários detectáveis |
-| 🔒 Senha com toggle | Campo de senha com botão de mostrar/ocultar |
-| 🗑️ Limpeza rápida | Limpa todos os campos do perfil ativo com um clique |
-| 🎭 Suporte a campos mascarados | Preenche CPF, telefone e datas com máscara automaticamente |
+| **Perfis ilimitados** | Crie, renomeie, duplique e alterne perfis ("Pessoal", "Trabalho", "Teste"…) |
+| **Detecção por pontuação** | Usa `autocomplete`, `id`/`name`, `<label>`, `aria-label`, placeholder e texto próximo, com padrões por palavra inteira ("cel" não casa com "cancel") |
+| **Formulários modernos** | React/Vue (eventos nativos), máscaras (digitação dígito a dígito), Shadow DOM, iframes, selects dependentes (UF → cidade), `input type="date"` |
+| **Campos brasileiros** | CPF, CEP, DDD separado, número/complemento/bairro, UF por sigla ou nome, dia/mês/ano separados, dados de meia-entrada (CIE) |
+| **Busca de CEP** | Digite o CEP e o endereço se completa via ViaCEP |
+| **Validação** | CPF (dígitos verificadores), data, CEP, telefone e e-mail validados no popup |
+| **Senhas criptografadas** | AES-256-GCM com senha mestra (PBKDF2). Sem senha mestra, senhas não são salvas |
+| **Auto-preenchimento por site** | Ligue só nos sites que quiser. A permissão é pedida por site e preenche só campos vazios, inclusive em SPAs |
+| **Mapeamento manual** | Clique direito num campo › *Mapear este campo como…* para ensinar campos que não são reconhecidos |
+| **Campos personalizados** | Crie campos (ex.: RG, Matrícula) com suas próprias palavras-chave |
+| **Dados de teste** | Gera perfis fictícios válidos (CPF, telefone, CEP, senha forte) para QA, sem salvar nada |
+| **Atalho e menu de contexto** | `Alt+Shift+F` preenche sem abrir o popup. O menu de contexto preenche com qualquer perfil |
+| **Resultado do preenchimento** | Mostra o que foi preenchido e o que ficou de fora, e destaca os campos na página |
+| **Backup** | Exporte e importe perfis num arquivo criptografado |
+| **Idiomas** | Português e inglês |
 
----
+## Instalação (desenvolvimento)
 
-## 📝 Campos Suportados
+1. Clone o repositório.
+2. Abra `chrome://extensions/` e ative o **Modo do desenvolvedor**.
+3. Clique em **Carregar sem compactação** e selecione a pasta do projeto.
 
-O Fifi-Filler reconhece e preenche os seguintes tipos de campo:
+Não há etapa de build: a extensão roda direto do código-fonte.
 
-| Campo | Identificadores reconhecidos |
-|---|---|
-| **Primeiro nome** | firstName, nome, fname, given-name |
-| **Sobrenome** | lastName, sobrenome, surname, family-name |
-| **E-mail** | email, e-mail, mail |
-| **Telefone** | phone, mobile, telephone, cel, cellphone, tel |
-| **Senha** | password, senha, pass, pwd, passwd |
-| **Endereço** | address, street, addr, endereco |
-| **Cidade** | city, town, cidade |
-| **Estado** | state, estado, province, region |
-| **CEP** | zip, postal, postcode, cep |
-| **CPF** | cpf, document, documento, documentNumber |
-| **Data de nascimento** | dateOfBirth, nascimento, birthdate, dob |
-| **CIE (ID estudantil)** | cie, student id, id estudante |
-| **Data de validade** | validityDate, validade, expiracao, expiry |
-| **Instituição** | institutionName, instituicao, escola, universidade |
-| **Curso** | course, curso, degree |
+## Uso
 
-> 💡 O Fifi-Filler também verifica atributos `aria-label`, `autocomplete`, `data-testid`, `data-field`, rótulos (`<label>`) associados e mais para aumentar a compatibilidade com diferentes sites.
+1. Clique no ícone › aba **Perfil** e preencha seus dados. Tudo salva sozinho.
+2. Em um site com formulário, clique em **Preencher agora** ou use `Alt+Shift+F`.
+3. Para salvar senhas, crie uma **senha mestra** em **Ajustes › Segurança**.
+4. Para preencher automaticamente ao abrir um site, ligue **Auto-preencher neste site** na aba **Preencher**.
 
----
+O atalho pode ser alterado em `chrome://extensions/shortcuts`.
 
-## 🚀 Instalação
+## Atualizando da 1.x
 
-Como esta é uma extensão **local** (não publicada na Chrome Web Store), a instalação é feita pelo **Modo Desenvolvedor** do Chrome. Siga os passos abaixo:
+Na primeira execução, os perfis 1 e 2 são migrados automaticamente. O campo "Endereço" passa a ser "Endereço (rua)". Senhas antigas, que eram salvas em texto puro, ficam pendentes até você criar uma senha mestra ou descartá-las. Um aviso aparece no popup. O auto-preenchimento global deixou de existir e agora é ativado por site.
 
-### Passo 1 — Baixar os arquivos
+## Desenvolvimento
 
-Faça o download ou extraia o conteúdo do arquivo `fifi-filler.zip` em uma pasta de sua preferência.
-
-```
-📁 fifi-filler/
-├── manifest.json
-├── content.js
-├── popup.js
-├── popup.html
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+```bash
+npm install
+npx playwright install chromium
+npm run lint        # ESLint
+npm run test:unit   # node:test — validação, migração, cofre, criptografia
+npm run test:e2e    # Playwright — content script em páginas de teste (React, máscaras, Shadow DOM…)
+npm run package     # gera dist/fifi-filler-<versão>.zip para a Chrome Web Store
 ```
 
-> ⚠️ Mantenha todos os arquivos juntos na mesma pasta. Não mova ou renomeie arquivos individualmente.
+O CI (GitHub Actions) roda lint e testes em cada push e gera o `.zip`. Ao criar uma tag `v*`, o `.zip` é anexado ao release.
 
----
-
-### Passo 2 — Abrir o Gerenciador de Extensões
-
-1. Abra o **Google Chrome**
-2. Na barra de endereço, digite e pressione **Enter**:
-   ```
-   chrome://extensions
-   ```
-
----
-
-### Passo 3 — Ativar o Modo Desenvolvedor
-
-No canto superior direito da página de extensões, ative a chave **"Modo do desenvolvedor"** (Developer mode).
-
-![Developer Mode toggle no canto superior direito]
-
----
-
-### Passo 4 — Carregar a extensão
-
-1. Clique no botão **"Carregar sem compactação"** (Load unpacked)
-2. Navegue até a pasta `fifi-filler/` que você extraiu no Passo 1
-3. Selecione a **pasta** (não um arquivo individual) e clique em **"Selecionar pasta"**
-
----
-
-### Passo 5 — Confirmar instalação
-
-A extensão **Fifi-Filler** deve aparecer na lista com seu ícone. Para facilitar o acesso:
-
-1. Clique no ícone de **quebra-cabeça** 🧩 na barra de ferramentas do Chrome
-2. Clique no ícone de **fixar** 📌 ao lado de "Fifi-Filler"
-
-A extensão agora aparecerá diretamente na sua barra de ferramentas. ✅
-
----
-
-## 🖱️ Como Usar
-
-### 1. Abrir o popup
-
-Clique no ícone do **Fifi-Filler** na barra de ferramentas do Chrome para abrir o painel.
-
-### 2. Preencher seus dados
-
-Preencha os campos do formulário no popup com suas informações pessoais (nome, e-mail, CPF, etc.).
-
-### 3. Salvar
-
-Clique em **"Salvar"** para armazenar os dados no perfil ativo. Os dados ficam salvos no armazenamento local do Chrome.
-
-### 4. Preencher um formulário
-
-Navegue até o site desejado, abra o popup do Fifi-Filler e clique em **"Preencher Agora"**.
-
-O Fifi-Filler irá detectar automaticamente os campos do formulário e preenchê-los com as informações salvas.
-
-### Botões do Popup
-
-| Botão | Ação |
-|---|---|
-| **Salvar** | Salva os dados do perfil ativo no armazenamento local |
-| **Preencher Agora** | Preenche o formulário da página atual imediatamente |
-| **Limpar** | Apaga todos os campos do perfil ativo (localmente) |
-| **👁️ / 🙈** | Alterna visibilidade do campo de senha |
-
----
-
-## 👤 Perfis
-
-O Fifi-Filler suporta **dois perfis independentes**, permitindo que você alterne entre diferentes conjuntos de dados (ex: uso pessoal e profissional).
-
-### Alternar entre perfis
-
-Use os botões **"Perfil 1"** e **"Perfil 2"** no topo do popup. Ao trocar de perfil:
-
-- Os dados do perfil atual são **salvos automaticamente**
-- Os dados do novo perfil são **carregados automaticamente**
-- Uma mensagem de confirmação aparece na tela
-
-> 💡 Os dados de cada perfil são armazenados de forma completamente independente — alterar um perfil não afeta o outro.
-
----
-
-## 🤖 Preenchimento Automático
-
-Ative a opção **"Preencher automaticamente ao abrir páginas"** para que o Fifi-Filler preencha os formulários automaticamente toda vez que você abrir um site com formulários detectáveis.
-
-> ⚠️ **Atenção:** O preenchimento automático ocorre **1,5 segundo** após o carregamento da página. Isso é intencional para aguardar que formulários dinâmicos (carregados via JavaScript) sejam renderizados.
-
-### Salvar ao preencher
-
-Ative a opção **"Salvar ao preencher"** para que os dados do popup sejam automaticamente salvos no perfil toda vez que você clicar em "Preencher Agora".
-
----
-
-## 🔍 Detecção de Formulários
-
-O popup exibe um **indicador de status** que informa se a página atual possui formulários detectáveis:
-
-| Status | Significado |
-|---|---|
-| 🟢 **Website detectado ✓** | A página possui campos de formulário compatíveis |
-| 🟡 **Nenhum formulário encontrado** | A página não possui campos detectáveis |
-| ⚪ **Nenhuma página detectada** | O popup foi aberto em uma página interna do Chrome |
-
----
-
-## 💡 Dicas e Boas Práticas
-
-- **Telefone e CPF com máscara:** Digite apenas os números (ex: `11999998888`). O Fifi-Filler cuida da formatação automaticamente ao preencher.
-- **Sites com frameworks modernos (React, Angular, Vue):** O Fifi-Filler simula a digitação real e dispara eventos de forma compatível com esses frameworks.
-- **Senha:** Use com cuidado. O campo de senha é preenchido somente em campos do tipo `password`. Não é recomendado salvar senhas de alta importância aqui.
-- **Campos não preenchidos:** Se um campo do site não for reconhecido, tente verificar se o atributo `name`, `id`, ou `placeholder` do campo corresponde a algum dos padrões suportados.
-- **Extensão desatualizada:** Se o Chrome indicar que a extensão precisa ser recarregada após uma atualização dos arquivos, vá em `chrome://extensions` e clique em **"Recarregar"** na extensão.
-
----
-
-## ❓ FAQ
-
-**Por que a extensão não preenche algum campo?**
-> O Fifi-Filler pode não reconhecer campos com nomes muito proprietários ou incomuns. Certifique-se de que o campo possui atributos de identificação padrão (`name`, `id`, `placeholder`, `aria-label`).
-
-**Meus dados são enviados para algum servidor?**
-> Não. Todos os dados são armazenados exclusivamente no armazenamento local do seu Chrome (`chrome.storage.local`) e nunca saem do seu navegador.
-
-**A extensão funciona em modo anônimo?**
-> Por padrão, não. Para habilitar, vá em `chrome://extensions`, clique em "Detalhes" no Fifi-Filler e ative **"Permitir no modo anônimo"**. Note que os dados salvos não estão disponíveis em abas anônimas a menos que sejam re-inseridos.
-
-**O que acontece se eu atualizar os arquivos da extensão?**
-> Vá em `chrome://extensions` e clique no ícone de **recarregar** (🔄) abaixo da extensão para aplicar as alterações.
-
-**Posso ter mais de dois perfis?**
-> Na versão atual (1.0.0), apenas dois perfis são suportados. Suporte a perfis adicionais pode ser adicionado em versões futuras.
-
----
-
-## 📁 Estrutura do Projeto
+## Estrutura
 
 ```
-fifi-filler/
-│
-├── manifest.json        # Configuração da extensão (Manifest v3)
-├── popup.html           # Interface do usuário (popup)
-├── popup.js             # Lógica do popup: perfis, salvar, preencher, toggles
-├── content.js           # Script injetado nas páginas: detecta e preenche campos
-│
-└── icons/
-    ├── icon16.png       # Ícone 16×16 px (barra de endereço)
-    ├── icon48.png       # Ícone 48×48 px (gerenciador de extensões)
-    └── icon128.png      # Ícone 128×128 px (Chrome Web Store / detalhes)
+manifest.json      MV3: permissões mínimas, atalho, menu de contexto
+background.js      service worker: orquestra o preenchimento, menus, auto-preenchimento por site
+content.js         detecção e preenchimento (injetado sob demanda)
+autofill.js        registrado só nos sites com auto-preenchimento ativo
+popup.html/css/js  interface (também abre em página inteira: popup.html?page=1)
+options.html/js    atalho para as configurações em página inteira
+lib/br.js          CPF, CEP, datas, telefone, UFs
+lib/fields.js      esquema do perfil e regras de detecção
+lib/fake.js        gerador de dados de teste
+lib/crypto.js      AES-GCM + PBKDF2 (WebCrypto)
+lib/store.js       armazenamento, migração, cofre, payloads
+_locales/          pt_BR e en
+tests/             unitários e e2e
 ```
 
-### Fluxo de funcionamento
+## Privacidade
 
-```
-Usuário clica "Preencher Agora"
-        │
-        ▼
-  popup.js coleta dados
-  do formulário do popup
-        │
-        ▼
-  Envia mensagem via
-  chrome.tabs.sendMessage()
-        │
-        ▼
-  content.js recebe a mensagem
-  e percorre FIELD_MAP
-        │
-        ▼
-  Para cada campo:
-  findField() → fillField()
-  (simula digitação real)
-        │
-        ▼
-  Retorna contagem de campos
-  preenchidos ao popup
-```
+Tudo fica no seu navegador. Veja [PRIVACY.md](PRIVACY.md).
 
----
+## Licença
 
-## 📄 Licença
-
-Este projeto é de uso pessoal e distribuído sob a licença **MIT**.
-
----
-
-> Feito com ❤️ — Fifi-Filler v1.0.0
+MIT

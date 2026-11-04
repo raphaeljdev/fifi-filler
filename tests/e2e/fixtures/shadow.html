@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Shadow DOM</title></head>
+<body>
+  <checkout-form></checkout-form>
+  <script>
+    customElements.define('checkout-form', class extends HTMLElement {
+      connectedCallback() {
+        const root = this.attachShadow({ mode: 'open' });
+        root.innerHTML = `
+          <form>
+            <label for="em">Email address</label><input id="em" type="email">
+            <label for="fn">Full name</label><input id="fn">
+            <label for="pc">Postal code</label><input id="pc">
+          </form>`;
+      }
+    });
+  </script>
+</body></html>
