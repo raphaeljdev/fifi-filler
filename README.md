@@ -27,13 +27,17 @@
 | **Backup** | Exporte e importe perfis num arquivo criptografado |
 | **Idiomas** | Português e inglês |
 
-## Instalação (desenvolvimento)
+## Instalação
 
-1. Clone o repositório.
+1. Baixe o `fifi-filler-<versão>.zip` do [último release](https://github.com/raphaeljdev/fifi-filler/releases/latest) e extraia numa pasta fixa.
 2. Abra `chrome://extensions/` e ative o **Modo do desenvolvedor**.
-3. Clique em **Carregar sem compactação** e selecione a pasta do projeto.
+3. Clique em **Carregar sem compactação** e selecione a pasta extraída.
 
-Não há etapa de build: a extensão roda direto do código-fonte.
+Não há etapa de build: dá para carregar direto de um clone do repositório.
+
+### Atualizando
+
+Extensões carregadas sem compactação não se atualizam sozinhas. Quando sai um release novo, o popup mostra um aviso com o link para baixar. Para atualizar, substitua os arquivos da pasta pelos da versão nova e clique em **Recarregar** (↻) no card da extensão em `chrome://extensions/`. Seus perfis são mantidos.
 
 ## Uso
 

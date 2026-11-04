@@ -463,5 +463,14 @@
   },
   "required": {
     "message": "Obrigatório"
+  },
+  "updateAvailable": {
+    "message": "Nova versão $1 disponível."
+  },
+  "updateDownload": {
+    "message": "Baixar"
+  },
+  "updateLater": {
+    "message": "Depois"
   }
 }

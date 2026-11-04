@@ -463,5 +463,14 @@
   },
   "required": {
     "message": "Required"
+  },
+  "updateAvailable": {
+    "message": "Version $1 is available."
+  },
+  "updateDownload": {
+    "message": "Download"
+  },
+  "updateLater": {
+    "message": "Later"
   }
 }

@@ -856,6 +856,48 @@
     e.target.value = '';
   });
 
+  // ── Update notice ──────────────────────────────────────────────────────────
+  // Unpacked installs never auto-update: compare with the latest GitHub release
+  // (cached 12h). Web Store installs (update_url set) update themselves.
+  const RELEASES_API = 'https://api.github.com/repos/raphaeljdev/fifi-filler/releases/latest';
+  const UPDATE_TTL = 12 * 60 * 60 * 1000;
+
+  function newerThan(a, b) {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+    for (let i = 0; i < 3; i++) {
+      if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) > (pb[i] || 0);
+    }
+    return false;
+  }
+
+  async function checkForUpdate() {
+    const manifest = chrome.runtime.getManifest();
+    if (manifest.update_url) return;
+    let { updateCheck } = await chrome.storage.local.get('updateCheck');
+    if (!updateCheck || Date.now() - updateCheck.at > UPDATE_TTL) {
+      try {
+        const res = await fetch(RELEASES_API, { headers: { Accept: 'application/vnd.github+json' } });
+        if (!res.ok) return;
+        const rel = await res.json();
+        updateCheck = { at: Date.now(), version: String(rel.tag_name || '').replace(/^v/, ''), url: rel.html_url, dismissed: updateCheck?.dismissed };
+        await chrome.storage.local.set({ updateCheck });
+      } catch {
+        return; // offline: try again next time
+      }
+    }
+    const { version, url, dismissed } = updateCheck;
+    if (!/^\d+(\.\d+)*$/.test(version) || !newerThan(version, manifest.version) || dismissed === version) return;
+    if (!/^https:\/\/github\.com\//.test(url)) return;
+    $('#updateText').textContent = t('updateAvailable', [version]);
+    $('#updateLink').href = url;
+    $('#updateBanner').hidden = false;
+    $('#updateDismiss').onclick = async () => {
+      await chrome.storage.local.set({ updateCheck: { ...updateCheck, dismissed: version } });
+      $('#updateBanner').hidden = true;
+    };
+  }
+
   // ── Boot ───────────────────────────────────────────────────────────────────
 
   function renderAll() {
@@ -881,6 +923,7 @@
   $('#version').textContent = `v${chrome.runtime.getManifest().version}`;
   renderAll();
   renderShortcut();
+  checkForUpdate();
   const initial = location.hash.slice(1);
   selectTab(['fill', 'profile', 'settings'].includes(initial) ? initial : 'fill');
   initFillTab();

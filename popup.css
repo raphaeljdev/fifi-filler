@@ -306,6 +306,9 @@ kbd {
   font-size: 12px;
 }
 .banner > svg { color: var(--warn); margin-top: 1px; }
+.banner-info { background: var(--accent-soft); border-color: var(--accent); }
+.banner-info > svg { color: var(--accent); }
+.banner a.btn { text-decoration: none; }
 .banner-actions { display: flex; gap: 6px; margin-top: 8px; }
 
 /* ── Modal ── */

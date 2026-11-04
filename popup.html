@@ -64,6 +64,17 @@
     <button role="tab" data-tab="settings" class="tab"><svg><use href="#i-sliders"/></svg><span data-i18n="tabSettings"></span></button>
   </nav>
 
+  <div class="banner banner-info" id="updateBanner" hidden>
+    <svg><use href="#i-download"/></svg>
+    <div>
+      <p id="updateText"></p>
+      <div class="banner-actions">
+        <a class="btn btn-sm btn-primary" id="updateLink" target="_blank" rel="noopener" data-i18n="updateDownload"></a>
+        <button class="btn btn-sm btn-ghost" id="updateDismiss" data-i18n="updateLater"></button>
+      </div>
+    </div>
+  </div>
+
   <div class="banner" id="legacyBanner" hidden>
     <svg><use href="#i-alert"/></svg>
     <div>
