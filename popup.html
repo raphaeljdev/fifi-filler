@@ -2,441 +2,210 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fifi-Filler</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap');
-
-    :root {
-      --bg: #0a0a0f;
-      --surface: #13131a;
-      --border: #1e1e2e;
-      --accent: #d802df;
-      --accent-glow: rgba(223, 2, 186, 0.25);
-      --success: #00c37d;
-      --text: #e8e8f0;
-      --muted: #6b6b8a;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      width: 360px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    /* ── Header ── */
-    .header {
-      background: linear-gradient(135deg, #000000 0%, #cb0098 100%);
-      padding: 14px 18px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -30px; right: -30px;
-      width: 100px; height: 100px;
-      background: rgba(255,255,255,0.07);
-      border-radius: 50%;
-    }
-    .header-icon { font-size: 22px; }
-    .header-text h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 15px; font-weight: 800;
-      letter-spacing: -0.3px; color: #fff;
-    }
-    .header-text p { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
-
-    /* ── Profile Switcher ── */
-    .profile-switcher {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .profile-switcher-label {
-      font-family: 'Syne', sans-serif;
-      font-size: 10px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-    .profile-tabs {
-      display: flex;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      flex: 1;
-    }
-    .profile-btn {
-      flex: 1;
-      padding: 5px 0;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-family: 'Syne', sans-serif;
-      font-size: 11px; font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      letter-spacing: 0.3px;
-    }
-    .profile-btn:first-child { border-right: 1px solid var(--border); }
-    .profile-btn.active {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-    .profile-btn:not(.active):hover { color: var(--text); }
-    .profile-active-label {
-      font-size: 11px;
-      color: var(--accent);
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      flex-shrink: 0;
-      min-width: 52px;
-      text-align: right;
-    }
-
-    /* ── Body ── */
-    .body { padding: 14px 16px; }
-
-    .section-label {
-      font-family: 'Syne', sans-serif;
-      font-size: 10px; font-weight: 700;
-      letter-spacing: 1.2px; text-transform: uppercase;
-      color: var(--muted);
-      margin: 10px 0 7px;
-    }
-
-    /* ── Field groups ── */
-    .field-group {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .field {
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      border-bottom: 1px solid var(--border);
-      gap: 8px;
-    }
-    .field:last-child { border-bottom: none; }
-
-    .field-icon { font-size: 13px; color: var(--muted); width: 18px; text-align: center; flex-shrink: 0; }
-
-    .field-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 8px 0;
-    }
-    .field-label { font-size: 10px; color: var(--muted); letter-spacing: 0.3px; margin-bottom: 2px; }
-
-    .field-content input,
-    .field-content select {
-      background: transparent;
-      border: none; outline: none;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      width: 100%;
-    }
-    .field-content input::placeholder { color: #3a3a55; }
-    .field-content select option { background: #13131a; }
-
-    /* Password toggle */
-    .field-pw {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .field-pw input { flex: 1; }
-    .pw-toggle {
-      background: none; border: none;
-      cursor: pointer; padding: 2px 4px;
-      color: var(--muted); font-size: 13px;
-      line-height: 1; transition: color 0.15s;
-      flex-shrink: 0;
-    }
-    .pw-toggle:hover { color: var(--text); }
-
-    .field-pair {
-      display: flex;
-      gap: 10px;
-    }
-    .field-pair input { flex: 1; }
-
-    /* ── Buttons ── */
-    .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
-
-    .btn {
-      flex: 1;
-      padding: 10px 0;
-      border-radius: 10px; border: none;
-      cursor: pointer;
-      font-family: 'Syne', sans-serif;
-      font-size: 12px; font-weight: 700;
-      letter-spacing: 0.3px;
-      transition: all 0.15s ease;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-    }
-    .btn-primary {
-      background: var(--accent); color: #fff;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .btn-primary:hover {
-      background: #0358c2;
-      box-shadow: 0 0 28px var(--accent-glow);
-      transform: translateY(-1px);
-    }
-    .btn-ghost {
-      background: var(--surface); color: var(--muted);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover { color: var(--text); border-color: #2e2e45; }
-
-    /* ── Options ── */
-    .options-group {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden; margin-bottom: 10px;
-    }
-    .option-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 12px; border-bottom: 1px solid var(--border);
-    }
-    .option-row:last-child { border-bottom: none; }
-    .option-label { font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 7px; }
-    .option-label span { color: var(--muted); font-size: 13px; }
-
-    /* ── Toggle ── */
-    .toggle { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
-    .toggle input { display: none; }
-    .toggle-track { width: 100%; height: 100%; background: var(--border); border-radius: 9px; cursor: pointer; transition: background 0.2s; }
-    .toggle input:checked + .toggle-track { background: var(--accent); }
-    .toggle-thumb {
-      position: absolute; top: 2px; left: 2px;
-      width: 14px; height: 14px;
-      background: #fff; border-radius: 50%;
-      pointer-events: none;
-      transition: transform 0.2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    }
-    .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
-
-    /* ── Status ── */
-    .status-bar {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 8px 12px;
-      display: flex; align-items: center; gap: 8px;
-      font-size: 11.5px; color: var(--muted);
-    }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
-    .status-dot.active { background: var(--success); box-shadow: 0 0 6px rgba(0,195,125,0.5); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-
-    /* ── Flash ── */
-    .flash {
-      position: fixed; bottom: 14px; left: 50%;
-      transform: translateX(-50%) translateY(40px);
-      background: var(--success); color: #fff;
-      font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
-      padding: 8px 18px; border-radius: 99px;
-      opacity: 0; transition: all 0.25s ease;
-      white-space: nowrap; pointer-events: none; z-index: 100;
-    }
-    .flash.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  </style>
+  <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+    <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M15 10h3M15 14h3"/></symbol>
+    <symbol id="i-cake" viewBox="0 0 24 24"><path d="M4 21h16M5 21v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7M12 12V8M10 6a2 2 0 0 0 4 0c0-1.5-2-3-2-3s-2 1.5-2 3z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.7"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></symbol>
+    <symbol id="i-city" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l5-3v16M10 21V10h9v11M13 13h3M13 17h3"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5L2 9z"/><path d="M6 11v5c2 2 10 2 12 0v-5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-school" viewBox="0 0 24 24"><path d="M3 21h18M4 21V10l8-6 8 6v11M9 21v-6h6v6"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h14"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.2 18.8A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.3-2.2L14 9V3M7 15h10"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 8h.01M16 16h.01M12 12h.01M16 8h.01M8 16h.01" stroke-width="3"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c6 0 10 6 10 6a17 17 0 0 1-3.2 3.8M6.6 6.6C3.9 8.3 2 12 2 12s4 7 10 7c1.5 0 2.9-.4 4.2-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/></symbol>
+  </svg>
 
-  <div class="header">
-    <div class="header-icon">📋</div>
-    <div class="header-text">
-      <h1>Fifi-Filler · Assistente de formulário</h1>
-      <p>by: Raphael - made with ❤️</p>
+  <header class="top">
+    <div class="brand">
+      <span class="logo"><svg><use href="#i-bolt"/></svg></span>
+      <span class="brand-name">Fifi-Filler</span>
+    </div>
+    <div class="profile-picker">
+      <span class="profile-dot" id="profileDot"></span>
+      <select id="profileSelect" data-i18n-title="profileSwitch" aria-label="Perfil"></select>
+      <button class="icon-btn" id="profileMenuBtn" data-i18n-title="profileManage"><svg><use href="#i-more"/></svg></button>
+    </div>
+    <button class="icon-btn" id="lockBtn" hidden><svg><use href="#i-lock"/></svg></button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="fill" class="tab"><svg><use href="#i-bolt"/></svg><span data-i18n="tabFill"></span></button>
+    <button role="tab" data-tab="profile" class="tab"><svg><use href="#i-user"/></svg><span data-i18n="tabProfile"></span><span class="save-state" id="saveState"></span></button>
+    <button role="tab" data-tab="settings" class="tab"><svg><use href="#i-sliders"/></svg><span data-i18n="tabSettings"></span></button>
+  </nav>
+
+  <div class="banner banner-info" id="updateBanner" hidden>
+    <svg><use href="#i-download"/></svg>
+    <div>
+      <p id="updateText"></p>
+      <div class="banner-actions">
+        <a class="btn btn-sm btn-primary" id="updateLink" target="_blank" rel="noopener" data-i18n="updateDownload"></a>
+        <button class="btn btn-sm btn-ghost" id="updateDismiss" data-i18n="updateLater"></button>
+      </div>
     </div>
   </div>
 
-  <!-- ── PROFILE SWITCHER ── -->
-  <div class="profile-switcher">
-    <span class="profile-switcher-label">Perfil</span>
-    <div class="profile-tabs">
-      <button class="profile-btn active" data-profile="1">Perfil 1</button>
-      <button class="profile-btn" data-profile="2">Perfil 2</button>
+  <div class="banner" id="legacyBanner" hidden>
+    <svg><use href="#i-alert"/></svg>
+    <div>
+      <p data-i18n="legacyBanner"></p>
+      <div class="banner-actions">
+        <button class="btn btn-sm btn-primary" id="legacyCreateVault" data-i18n="vaultCreate"></button>
+        <button class="btn btn-sm btn-ghost" id="legacyDiscard" data-i18n="legacyDiscard"></button>
+      </div>
     </div>
-    <span class="profile-active-label" id="profileLabel">Perfil 1</span>
   </div>
 
-  <div class="body">
+  <main>
+    <!-- ── FILL ── -->
+    <section class="panel" id="tab-fill" role="tabpanel">
+      <div class="site-card">
+        <div class="site-icon"><svg><use href="#i-globe"/></svg></div>
+        <div class="site-info">
+          <div class="site-host" id="siteHost">—</div>
+          <div class="site-status"><span class="dot" id="statusDot"></span><span id="statusText" data-i18n="statusScanning"></span></div>
+        </div>
+      </div>
 
-    <!-- ── PERSONAL DATA ── -->
-    <div class="section-label">Dados Pessoais</div>
-    <div class="field-group">
-      <div class="field">
-        <div class="field-icon">👤</div>
-        <div class="field-content">
-          <div class="field-label">Nome</div>
-          <input id="firstName" type="text" placeholder="João" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">👤</div>
-        <div class="field-content">
-          <div class="field-label">Sobrenome</div>
-          <input id="lastName" type="text" placeholder="Silva" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">🪪</div>
-        <div class="field-content">
-          <div class="field-label">CPF</div>
-          <input id="cpf" type="text" placeholder="000.000.000-00" maxlength="14" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">🎂</div>
-        <div class="field-content">
-          <div class="field-label">Data de Nascimento</div>
-          <input id="dateOfBirth" type="text" placeholder="DD/MM/AAAA" maxlength="10" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">✉️</div>
-        <div class="field-content">
-          <div class="field-label">E-mail</div>
-          <input id="email" type="email" placeholder="joao@email.com" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">📱</div>
-        <div class="field-content">
-          <div class="field-label">Telefone</div>
-          <input id="phone" type="tel" placeholder="+55 11 99999-0000" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">🔒</div>
-        <div class="field-content">
-          <div class="field-label">Senha</div>
-          <div class="field-pw">
-            <input id="password" type="password" placeholder="••••••••" autocomplete="off" />
-            <button class="pw-toggle" id="pwToggle" title="Mostrar/ocultar senha">👁️</button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <button class="btn btn-primary btn-lg" id="fillBtn">
+        <svg><use href="#i-bolt"/></svg>
+        <span data-i18n="fillNow"></span>
+        <kbd id="shortcutKbd" hidden></kbd>
+      </button>
+      <button class="btn btn-ghost" id="fakeFillBtn">
+        <svg><use href="#i-flask"/></svg><span data-i18n="fillFake"></span>
+      </button>
 
-    <!-- ── STUDENT FIELDS ── -->
-    <div class="section-label">Meia-Entrada Estudante</div>
-    <div class="field-group">
-      <div class="field">
-        <div class="field-icon">🎓</div>
-        <div class="field-content">
-          <div class="field-label">CIE (Carteira do Estudante)</div>
-          <input id="cie" type="text" placeholder="Número da CIE" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">📅</div>
-        <div class="field-content">
-          <div class="field-label">Data de Expiração</div>
-          <input id="validityDate" type="text" placeholder="DD/MM/AAAA" maxlength="10" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">🏫</div>
-        <div class="field-content">
-          <div class="field-label">Nome da Instituição</div>
-          <input id="institutionName" type="text" placeholder="USP, UNICAMP..." />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">📚</div>
-        <div class="field-content">
-          <div class="field-label">Curso</div>
-          <input id="course" type="text" placeholder="Engenharia, Direito..." />
-        </div>
-      </div>
-    </div>
-
-    <!-- ── ADDRESS ── -->
-    <div class="section-label">Endereço</div>
-    <div class="field-group">
-      <div class="field">
-        <div class="field-icon">🏠</div>
-        <div class="field-content">
-          <div class="field-label">Endereço</div>
-          <input id="address" type="text" placeholder="Rua das Flores, 123" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">🏙️</div>
-        <div class="field-content">
-          <div class="field-label">Cidade</div>
-          <input id="city" type="text" placeholder="São Paulo" />
-        </div>
-      </div>
-      <div class="field">
-        <div class="field-icon">🗺️</div>
-        <div class="field-content">
-          <div class="field-label">Estado / CEP</div>
-          <div class="field-pair">
-            <input id="state" type="text" placeholder="SP" maxlength="2" style="max-width:50px" />
-            <input id="zip" type="text" placeholder="01310-100" maxlength="9" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── OPTIONS ── -->
-    <div class="section-label">Opções</div>
-    <div class="options-group">
-      <div class="option-row">
-        <div class="option-label"><span>⚡</span> Preencher ao carregar a página</div>
-        <label class="toggle">
-          <input type="checkbox" id="autoFill" />
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
+      <div class="card">
+        <label class="row">
+          <span class="row-text">
+            <span class="row-title" data-i18n="autoFillSite"></span>
+            <span class="row-sub" data-i18n="autoFillSiteSub"></span>
+          </span>
+          <span class="switch"><input type="checkbox" id="autoFillSite" /><span></span></span>
         </label>
       </div>
-      <div class="option-row">
-        <div class="option-label"><span>💾</span> Salvar perfil localmente</div>
-        <label class="toggle">
-          <input type="checkbox" id="saveProfile" checked />
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
-        </label>
+
+      <div class="result" id="result" hidden>
+        <div class="result-head">
+          <span id="resultTitle"></span>
+          <button class="icon-btn" id="resultClose" data-i18n-title="close"><svg><use href="#i-x"/></svg></button>
+        </div>
+        <p class="result-note" id="resultNote" hidden></p>
+        <div class="chips" id="resultFilled"></div>
+        <div class="chips chips-muted" id="resultMissed"></div>
+        <dl class="fake-values" id="resultValues" hidden></dl>
       </div>
-    </div>
+    </section>
 
-    <!-- ── ACTIONS ── -->
-    <div class="btn-row">
-      <button class="btn btn-primary" id="fillBtn">⚡ Preencher Agora</button>
-      <button class="btn btn-ghost" id="saveBtn">💾 Salvar</button>
-      <button class="btn btn-ghost" id="clearBtn">🗑️</button>
-    </div>
+    <!-- ── PROFILE ── -->
+    <section class="panel" id="tab-profile" role="tabpanel" hidden>
+      <div class="toolbar">
+        <button class="btn btn-sm btn-ghost" id="fakeProfileBtn"><svg><use href="#i-dice"/></svg><span data-i18n="fakeProfile"></span></button>
+        <button class="btn btn-sm btn-ghost" id="clearProfileBtn"><svg><use href="#i-trash"/></svg><span data-i18n="clearProfile"></span></button>
+      </div>
+      <form id="profileForm" autocomplete="off" novalidate></form>
+    </section>
 
-    <div class="status-bar">
-      <div class="status-dot" id="statusDot"></div>
-      <span id="statusText">Não detectado.</span>
-    </div>
-  </div>
+    <!-- ── SETTINGS ── -->
+    <section class="panel" id="tab-settings" role="tabpanel" hidden>
+      <h2 class="section-title"><svg><use href="#i-shield"/></svg><span data-i18n="secTitle"></span></h2>
+      <div class="card pad">
+        <p class="muted" id="vaultStatus"></p>
+        <div class="btn-row" id="vaultActions"></div>
+      </div>
 
-  <div class="flash" id="flash"></div>
+      <h2 class="section-title"><svg><use href="#i-bolt"/></svg><span data-i18n="fillTitle"></span></h2>
+      <div class="card">
+        <label class="row">
+          <span class="row-text"><span class="row-title" data-i18n="highlight"></span></span>
+          <span class="switch"><input type="checkbox" id="highlightToggle" /><span></span></span>
+        </label>
+        <div class="row">
+          <span class="row-text">
+            <span class="row-title" data-i18n="shortcut"></span>
+            <span class="row-sub" id="shortcutText"></span>
+          </span>
+          <button class="btn btn-sm btn-ghost" id="shortcutBtn" data-i18n="change"></button>
+        </div>
+      </div>
+
+      <h2 class="section-title"><svg><use href="#i-plus"/></svg><span data-i18n="customTitle"></span></h2>
+      <div class="card">
+        <div id="customList"></div>
+        <form class="row add-custom" id="customForm">
+          <input id="customLabel" data-i18n-ph="customLabelPh" required maxlength="40" />
+          <input id="customPatterns" data-i18n-ph="customPatternsPh" maxlength="200" />
+          <button class="icon-btn accent" type="submit" data-i18n-title="add"><svg><use href="#i-plus"/></svg></button>
+        </form>
+      </div>
+      <p class="hint" data-i18n="customHint"></p>
+
+      <h2 class="section-title"><svg><use href="#i-globe"/></svg><span data-i18n="sitesTitle"></span></h2>
+      <div class="card" id="sitesList"></div>
+      <p class="hint" data-i18n="sitesHint"></p>
+
+      <h2 class="section-title"><svg><use href="#i-download"/></svg><span data-i18n="backupTitle"></span></h2>
+      <div class="card pad">
+        <p class="muted" data-i18n="backupSub"></p>
+        <div class="btn-row">
+          <button class="btn btn-sm btn-ghost" id="exportBtn"><svg><use href="#i-download"/></svg><span data-i18n="export"></span></button>
+          <button class="btn btn-sm btn-ghost" id="importBtn"><svg><use href="#i-upload"/></svg><span data-i18n="import"></span></button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+        </div>
+      </div>
+
+      <p class="about"><span id="version"></span> · <a href="https://github.com/raphaeljdev/fifi-filler" target="_blank" rel="noopener">GitHub</a> · <a href="https://github.com/raphaeljdev/fifi-filler/blob/main/PRIVACY.md" target="_blank" rel="noopener" data-i18n="privacy"></a></p>
+    </section>
+  </main>
+
+  <dialog id="modal">
+    <form method="dialog" id="modalForm">
+      <h3 id="modalTitle"></h3>
+      <p id="modalText" class="muted"></p>
+      <div id="modalFields"></div>
+      <p id="modalError" class="error" hidden></p>
+      <div class="modal-actions" id="modalActions"></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="lib/br.js"></script>
+  <script src="lib/fields.js"></script>
+  <script src="lib/fake.js"></script>
+  <script src="lib/crypto.js"></script>
+  <script src="lib/store.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

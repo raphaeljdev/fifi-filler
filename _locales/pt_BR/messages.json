@@ -1,0 +1,476 @@
+{
+  "extName": {
+    "message": "Fifi-Filler"
+  },
+  "extDescription": {
+    "message": "Preenche formulários de cadastro e checkout com seus perfis, com detecção inteligente, CEP automático e senhas criptografadas."
+  },
+  "cmdFill": {
+    "message": "Preencher formulário da página"
+  },
+  "menuFill": {
+    "message": "Preencher com perfil ativo"
+  },
+  "menuFillFake": {
+    "message": "Preencher com dados de teste"
+  },
+  "menuFillWith": {
+    "message": "Preencher com…"
+  },
+  "menuMapAs": {
+    "message": "Mapear este campo como…"
+  },
+  "menuUnmap": {
+    "message": "Remover mapeamento deste campo"
+  },
+  "f_fullName": {
+    "message": "Nome completo"
+  },
+  "f_firstName": {
+    "message": "Nome"
+  },
+  "f_lastName": {
+    "message": "Sobrenome"
+  },
+  "f_cpf": {
+    "message": "CPF"
+  },
+  "f_dateOfBirth": {
+    "message": "Data de nascimento"
+  },
+  "f_email": {
+    "message": "E-mail"
+  },
+  "f_phone": {
+    "message": "Telefone"
+  },
+  "f_phoneDdd": {
+    "message": "DDD"
+  },
+  "f_password": {
+    "message": "Senha"
+  },
+  "f_birthDay": {
+    "message": "Dia de nascimento"
+  },
+  "f_birthMonth": {
+    "message": "Mês de nascimento"
+  },
+  "f_birthYear": {
+    "message": "Ano de nascimento"
+  },
+  "f_zip": {
+    "message": "CEP"
+  },
+  "f_street": {
+    "message": "Endereço"
+  },
+  "f_number": {
+    "message": "Número"
+  },
+  "f_complement": {
+    "message": "Complemento"
+  },
+  "f_neighborhood": {
+    "message": "Bairro"
+  },
+  "f_city": {
+    "message": "Cidade"
+  },
+  "f_state": {
+    "message": "UF"
+  },
+  "f_cie": {
+    "message": "CIE (carteira do estudante)"
+  },
+  "f_validityDate": {
+    "message": "Validade da CIE"
+  },
+  "f_institutionName": {
+    "message": "Instituição"
+  },
+  "f_course": {
+    "message": "Curso"
+  },
+  "sec_personal": {
+    "message": "Dados pessoais"
+  },
+  "sec_address": {
+    "message": "Endereço"
+  },
+  "sec_student": {
+    "message": "Meia-entrada estudante"
+  },
+  "sec_custom": {
+    "message": "Campos personalizados"
+  },
+  "tabFill": {
+    "message": "Preencher"
+  },
+  "tabProfile": {
+    "message": "Perfil"
+  },
+  "tabSettings": {
+    "message": "Ajustes"
+  },
+  "profileSwitch": {
+    "message": "Trocar perfil"
+  },
+  "profileManage": {
+    "message": "Gerenciar perfis"
+  },
+  "profileNew": {
+    "message": "Novo perfil"
+  },
+  "profileRename": {
+    "message": "Renomear"
+  },
+  "profileDuplicate": {
+    "message": "Duplicar"
+  },
+  "profileDelete": {
+    "message": "Excluir perfil"
+  },
+  "profileDeleteConfirm": {
+    "message": "Excluir o perfil \"$1\"? Isso não pode ser desfeito."
+  },
+  "profileName": {
+    "message": "Nome do perfil"
+  },
+  "profileCopyName": {
+    "message": "$1 (cópia)"
+  },
+  "profileDefaultName": {
+    "message": "Perfil $1"
+  },
+  "profileImportedName": {
+    "message": "$1 (importado)"
+  },
+  "profileLoaded": {
+    "message": "Perfil \"$1\" ativo"
+  },
+  "legacyBanner": {
+    "message": "Encontramos senhas da versão antiga salvas sem criptografia. Crie uma senha mestra para protegê-las ou descarte-as."
+  },
+  "legacyDiscard": {
+    "message": "Descartar senhas"
+  },
+  "legacyDiscardConfirm": {
+    "message": "As senhas antigas serão apagadas. Os demais dados ficam."
+  },
+  "statusScanning": {
+    "message": "Analisando página…"
+  },
+  "statusFields": {
+    "message": "$1 campo(s) reconhecido(s)"
+  },
+  "statusNoForm": {
+    "message": "Nenhum formulário reconhecido"
+  },
+  "statusUnsupported": {
+    "message": "Página não suportada"
+  },
+  "statusNoAccess": {
+    "message": "Sem acesso a esta página"
+  },
+  "pageModeHost": {
+    "message": "Configurações"
+  },
+  "pageModeStatus": {
+    "message": "Abra pelo ícone da extensão para preencher"
+  },
+  "fillNow": {
+    "message": "Preencher agora"
+  },
+  "fillFake": {
+    "message": "Preencher com dados de teste"
+  },
+  "autoFillSite": {
+    "message": "Auto-preencher neste site"
+  },
+  "autoFillSiteSub": {
+    "message": "Preenche campos vazios ao abrir a página"
+  },
+  "autoFillOn": {
+    "message": "Auto-preenchimento ativado neste site"
+  },
+  "autoFillOff": {
+    "message": "Auto-preenchimento desativado"
+  },
+  "permDenied": {
+    "message": "Permissão negada"
+  },
+  "fillDone": {
+    "message": "$1 campo(s) preenchido(s)"
+  },
+  "fillNone": {
+    "message": "Nenhum campo preenchido"
+  },
+  "fillNoForm": {
+    "message": "Nenhum formulário encontrado"
+  },
+  "fillError": {
+    "message": "Não foi possível preencher"
+  },
+  "notFound": {
+    "message": "Não encontrados:"
+  },
+  "pwSkippedLocked": {
+    "message": "Senha não preenchida: o cofre está bloqueado."
+  },
+  "copy": {
+    "message": "Copiar"
+  },
+  "copied": {
+    "message": "Copiado"
+  },
+  "close": {
+    "message": "Fechar"
+  },
+  "fakeProfile": {
+    "message": "Dados de teste"
+  },
+  "fakeProfileConfirm": {
+    "message": "Substituir os dados deste perfil por dados fictícios?"
+  },
+  "fakeProfileDone": {
+    "message": "Perfil preenchido com dados fictícios"
+  },
+  "clearProfile": {
+    "message": "Limpar"
+  },
+  "clearProfileConfirm": {
+    "message": "Apagar todos os dados do perfil \"$1\"?"
+  },
+  "cleared": {
+    "message": "Perfil limpo"
+  },
+  "cepLookup": {
+    "message": "Buscar endereço pelo CEP"
+  },
+  "cepFound": {
+    "message": "Endereço encontrado"
+  },
+  "cepNotFound": {
+    "message": "CEP não encontrado"
+  },
+  "errCpf": {
+    "message": "CPF inválido"
+  },
+  "errDate": {
+    "message": "Data inválida"
+  },
+  "errCep": {
+    "message": "CEP deve ter 8 dígitos"
+  },
+  "errPhone": {
+    "message": "Telefone com DDD (10 ou 11 dígitos)"
+  },
+  "errEmail": {
+    "message": "E-mail inválido"
+  },
+  "errUf": {
+    "message": "UF inválida"
+  },
+  "pwToggle": {
+    "message": "Mostrar/ocultar"
+  },
+  "pwGenerate": {
+    "message": "Gerar senha forte"
+  },
+  "pwNeedsVault": {
+    "message": "Senhas só são salvas criptografadas."
+  },
+  "pwLocked": {
+    "message": "Senha salva. Cofre bloqueado."
+  },
+  "pwLockedEmpty": {
+    "message": "Cofre bloqueado."
+  },
+  "secTitle": {
+    "message": "Segurança"
+  },
+  "vaultNone": {
+    "message": "Sem senha mestra: senhas não são salvas."
+  },
+  "vaultIsLocked": {
+    "message": "Cofre bloqueado. Desbloqueie para ver, editar ou preencher senhas."
+  },
+  "vaultIsUnlocked": {
+    "message": "Cofre desbloqueado até você fechar o navegador ou bloquear."
+  },
+  "vaultCreate": {
+    "message": "Criar senha mestra"
+  },
+  "vaultCreateText": {
+    "message": "Suas senhas serão criptografadas (AES-256) com esta senha mestra. Se você esquecê-la, as senhas salvas não podem ser recuperadas."
+  },
+  "vaultMaster": {
+    "message": "Senha mestra"
+  },
+  "vaultNewMaster": {
+    "message": "Nova senha mestra"
+  },
+  "vaultConfirm": {
+    "message": "Confirmar"
+  },
+  "vaultTooShort": {
+    "message": "Use pelo menos 6 caracteres"
+  },
+  "vaultMismatch": {
+    "message": "As senhas não coincidem"
+  },
+  "vaultWrong": {
+    "message": "Senha incorreta"
+  },
+  "vaultCreated": {
+    "message": "Senha mestra criada"
+  },
+  "vaultUnlock": {
+    "message": "Desbloquear"
+  },
+  "vaultUnlocked": {
+    "message": "Cofre desbloqueado"
+  },
+  "vaultLockNow": {
+    "message": "Bloquear"
+  },
+  "vaultLocked": {
+    "message": "Cofre bloqueado"
+  },
+  "vaultChange": {
+    "message": "Alterar senha mestra"
+  },
+  "vaultChanged": {
+    "message": "Senha mestra alterada"
+  },
+  "vaultRemove": {
+    "message": "Remover cofre"
+  },
+  "vaultRemoveConfirm": {
+    "message": "Remove a senha mestra e APAGA todas as senhas salvas. Continuar?"
+  },
+  "vaultRemoved": {
+    "message": "Cofre removido"
+  },
+  "fillTitle": {
+    "message": "Preenchimento"
+  },
+  "highlight": {
+    "message": "Destacar campos preenchidos"
+  },
+  "shortcut": {
+    "message": "Atalho de teclado"
+  },
+  "shortcutNone": {
+    "message": "Nenhum atalho definido"
+  },
+  "change": {
+    "message": "Alterar"
+  },
+  "customTitle": {
+    "message": "Campos personalizados"
+  },
+  "customLabelPh": {
+    "message": "Nome (ex.: RG)"
+  },
+  "customPatternsPh": {
+    "message": "Palavras-chave: rg, identidade"
+  },
+  "customHint": {
+    "message": "As palavras-chave são procuradas nos rótulos, nomes e placeholders dos campos."
+  },
+  "customEmpty": {
+    "message": "Nenhum campo personalizado"
+  },
+  "customAdded": {
+    "message": "Campo adicionado"
+  },
+  "customDeleteConfirm": {
+    "message": "Excluir o campo \"$1\" e seus valores em todos os perfis?"
+  },
+  "add": {
+    "message": "Adicionar"
+  },
+  "sitesTitle": {
+    "message": "Sites"
+  },
+  "sitesEmpty": {
+    "message": "Nenhuma regra de site"
+  },
+  "sitesHint": {
+    "message": "Clique com o botão direito num campo › Fifi-Filler › Mapear este campo como… para ensinar campos não reconhecidos."
+  },
+  "tagAuto": {
+    "message": "auto"
+  },
+  "mappingsCount": {
+    "message": "$1 mapeamento(s)"
+  },
+  "siteForget": {
+    "message": "Esquecer site"
+  },
+  "backupTitle": {
+    "message": "Backup"
+  },
+  "backupSub": {
+    "message": "Exporte seus perfis num arquivo criptografado e importe em outro navegador."
+  },
+  "export": {
+    "message": "Exportar"
+  },
+  "import": {
+    "message": "Importar"
+  },
+  "backupPass": {
+    "message": "Senha do backup"
+  },
+  "exportText": {
+    "message": "O arquivo será criptografado com esta senha."
+  },
+  "exportTextLocked": {
+    "message": "O arquivo será criptografado com esta senha. O cofre está bloqueado, então senhas salvas não serão incluídas."
+  },
+  "exported": {
+    "message": "Backup exportado"
+  },
+  "imported": {
+    "message": "Backup importado"
+  },
+  "importedNoPw": {
+    "message": "Importado. $1 senha(s) ignorada(s): desbloqueie ou crie o cofre e importe de novo."
+  },
+  "importInvalid": {
+    "message": "Arquivo de backup inválido"
+  },
+  "privacy": {
+    "message": "Privacidade"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "cancel": {
+    "message": "Cancelar"
+  },
+  "delete": {
+    "message": "Excluir"
+  },
+  "clear": {
+    "message": "Limpar"
+  },
+  "replace": {
+    "message": "Substituir"
+  },
+  "required": {
+    "message": "Obrigatório"
+  },
+  "updateAvailable": {
+    "message": "Nova versão $1 disponível."
+  },
+  "updateDownload": {
+    "message": "Baixar"
+  },
+  "updateLater": {
+    "message": "Depois"
+  }
+}

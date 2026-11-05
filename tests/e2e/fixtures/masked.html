@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><title>Máscaras</title></head>
+<body>
+  <form>
+    <label>CPF <input name="cpf" data-mask="000.000.000-00"></label>
+    <label>Telefone <input name="telefone" data-mask="(00) 00000-0000"></label>
+    <label>Nascimento <input name="nascimento" data-mask="00/00/0000"></label>
+    <label>CEP <input name="cep" data-mask="00000-000"></label>
+    <label>Validade da carteira <input name="validade" maxlength="10"></label>
+    <label>Data (nativo) <input name="birthdate" type="date"></label>
+  </form>
+  <script>
+    // Minimal digit mask like common jQuery/vanilla mask plugins.
+    for (const input of document.querySelectorAll('[data-mask]')) {
+      const mask = input.dataset.mask;
+      input.maxLength = mask.length;
+      input.addEventListener('input', () => {
+        const d = input.value.replace(/\D/g, '');
+        let out = '';
+        let i = 0;
+        for (const ch of mask) {
+          if (i >= d.length) break;
+          out += ch === '0' ? d[i++] : ch;
+        }
+        input.value = out;
+      });
+    }
+  </script>
+</body></html>

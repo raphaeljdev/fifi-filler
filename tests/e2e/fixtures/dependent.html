@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><title>Selects dependentes</title></head>
+<body>
+  <form>
+    <label for="estado">UF</label>
+    <select id="estado" name="estado"><option value="">--</option><option value="1">MG</option><option value="2">SP</option></select>
+    <label for="cidade">Cidade</label>
+    <select id="cidade" name="cidade" disabled><option value="">Selecione o estado</option></select>
+  </form>
+  <script>
+    const cities = { 1: ['Belo Horizonte', 'Uberlândia'], 2: ['Campinas', 'São Paulo'] };
+    const city = document.getElementById('cidade');
+    document.getElementById('estado').addEventListener('change', e => {
+      city.disabled = true;
+      setTimeout(() => {
+        city.replaceChildren(new Option('--', ''), ...(cities[e.target.value] || []).map((c, i) => new Option(c, `c${i}`)));
+        city.disabled = false;
+      }, 300);
+    });
+  </script>
+</body></html>

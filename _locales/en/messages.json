@@ -1,0 +1,476 @@
+{
+  "extName": {
+    "message": "Fifi-Filler"
+  },
+  "extDescription": {
+    "message": "Fills sign-up and checkout forms from your profiles, with smart detection, Brazilian CEP lookup and encrypted passwords."
+  },
+  "cmdFill": {
+    "message": "Fill the form on this page"
+  },
+  "menuFill": {
+    "message": "Fill with active profile"
+  },
+  "menuFillFake": {
+    "message": "Fill with test data"
+  },
+  "menuFillWith": {
+    "message": "Fill with…"
+  },
+  "menuMapAs": {
+    "message": "Map this field as…"
+  },
+  "menuUnmap": {
+    "message": "Remove mapping for this field"
+  },
+  "f_fullName": {
+    "message": "Full name"
+  },
+  "f_firstName": {
+    "message": "First name"
+  },
+  "f_lastName": {
+    "message": "Last name"
+  },
+  "f_cpf": {
+    "message": "CPF"
+  },
+  "f_dateOfBirth": {
+    "message": "Date of birth"
+  },
+  "f_email": {
+    "message": "Email"
+  },
+  "f_phone": {
+    "message": "Phone"
+  },
+  "f_phoneDdd": {
+    "message": "Area code"
+  },
+  "f_password": {
+    "message": "Password"
+  },
+  "f_birthDay": {
+    "message": "Birth day"
+  },
+  "f_birthMonth": {
+    "message": "Birth month"
+  },
+  "f_birthYear": {
+    "message": "Birth year"
+  },
+  "f_zip": {
+    "message": "ZIP / CEP"
+  },
+  "f_street": {
+    "message": "Street"
+  },
+  "f_number": {
+    "message": "Number"
+  },
+  "f_complement": {
+    "message": "Complement"
+  },
+  "f_neighborhood": {
+    "message": "Neighborhood"
+  },
+  "f_city": {
+    "message": "City"
+  },
+  "f_state": {
+    "message": "State"
+  },
+  "f_cie": {
+    "message": "Student ID (CIE)"
+  },
+  "f_validityDate": {
+    "message": "Student ID expiry"
+  },
+  "f_institutionName": {
+    "message": "Institution"
+  },
+  "f_course": {
+    "message": "Course"
+  },
+  "sec_personal": {
+    "message": "Personal"
+  },
+  "sec_address": {
+    "message": "Address"
+  },
+  "sec_student": {
+    "message": "Student"
+  },
+  "sec_custom": {
+    "message": "Custom fields"
+  },
+  "tabFill": {
+    "message": "Fill"
+  },
+  "tabProfile": {
+    "message": "Profile"
+  },
+  "tabSettings": {
+    "message": "Settings"
+  },
+  "profileSwitch": {
+    "message": "Switch profile"
+  },
+  "profileManage": {
+    "message": "Manage profiles"
+  },
+  "profileNew": {
+    "message": "New profile"
+  },
+  "profileRename": {
+    "message": "Rename"
+  },
+  "profileDuplicate": {
+    "message": "Duplicate"
+  },
+  "profileDelete": {
+    "message": "Delete profile"
+  },
+  "profileDeleteConfirm": {
+    "message": "Delete profile \"$1\"? This cannot be undone."
+  },
+  "profileName": {
+    "message": "Profile name"
+  },
+  "profileCopyName": {
+    "message": "$1 (copy)"
+  },
+  "profileDefaultName": {
+    "message": "Profile $1"
+  },
+  "profileImportedName": {
+    "message": "$1 (imported)"
+  },
+  "profileLoaded": {
+    "message": "Profile \"$1\" active"
+  },
+  "legacyBanner": {
+    "message": "Passwords from the old version are stored unencrypted. Create a master password to protect them, or discard them."
+  },
+  "legacyDiscard": {
+    "message": "Discard passwords"
+  },
+  "legacyDiscardConfirm": {
+    "message": "Old passwords will be deleted. Other data is kept."
+  },
+  "statusScanning": {
+    "message": "Scanning page…"
+  },
+  "statusFields": {
+    "message": "$1 field(s) recognized"
+  },
+  "statusNoForm": {
+    "message": "No form recognized"
+  },
+  "statusUnsupported": {
+    "message": "Unsupported page"
+  },
+  "statusNoAccess": {
+    "message": "No access to this page"
+  },
+  "pageModeHost": {
+    "message": "Settings"
+  },
+  "pageModeStatus": {
+    "message": "Open from the toolbar icon to fill"
+  },
+  "fillNow": {
+    "message": "Fill now"
+  },
+  "fillFake": {
+    "message": "Fill with test data"
+  },
+  "autoFillSite": {
+    "message": "Auto-fill on this site"
+  },
+  "autoFillSiteSub": {
+    "message": "Fills empty fields when the page loads"
+  },
+  "autoFillOn": {
+    "message": "Auto-fill enabled on this site"
+  },
+  "autoFillOff": {
+    "message": "Auto-fill disabled"
+  },
+  "permDenied": {
+    "message": "Permission denied"
+  },
+  "fillDone": {
+    "message": "$1 field(s) filled"
+  },
+  "fillNone": {
+    "message": "No fields filled"
+  },
+  "fillNoForm": {
+    "message": "No form found"
+  },
+  "fillError": {
+    "message": "Could not fill"
+  },
+  "notFound": {
+    "message": "Not found:"
+  },
+  "pwSkippedLocked": {
+    "message": "Password skipped: the vault is locked."
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "copied": {
+    "message": "Copied"
+  },
+  "close": {
+    "message": "Close"
+  },
+  "fakeProfile": {
+    "message": "Test data"
+  },
+  "fakeProfileConfirm": {
+    "message": "Replace this profile with fake data?"
+  },
+  "fakeProfileDone": {
+    "message": "Profile filled with fake data"
+  },
+  "clearProfile": {
+    "message": "Clear"
+  },
+  "clearProfileConfirm": {
+    "message": "Erase all data in profile \"$1\"?"
+  },
+  "cleared": {
+    "message": "Profile cleared"
+  },
+  "cepLookup": {
+    "message": "Look up address by CEP"
+  },
+  "cepFound": {
+    "message": "Address found"
+  },
+  "cepNotFound": {
+    "message": "CEP not found"
+  },
+  "errCpf": {
+    "message": "Invalid CPF"
+  },
+  "errDate": {
+    "message": "Invalid date"
+  },
+  "errCep": {
+    "message": "CEP must have 8 digits"
+  },
+  "errPhone": {
+    "message": "Phone with area code (10 or 11 digits)"
+  },
+  "errEmail": {
+    "message": "Invalid email"
+  },
+  "errUf": {
+    "message": "Invalid state"
+  },
+  "pwToggle": {
+    "message": "Show/hide"
+  },
+  "pwGenerate": {
+    "message": "Generate strong password"
+  },
+  "pwNeedsVault": {
+    "message": "Passwords are only saved encrypted."
+  },
+  "pwLocked": {
+    "message": "Password saved. Vault locked."
+  },
+  "pwLockedEmpty": {
+    "message": "Vault locked."
+  },
+  "secTitle": {
+    "message": "Security"
+  },
+  "vaultNone": {
+    "message": "No master password: passwords are not saved."
+  },
+  "vaultIsLocked": {
+    "message": "Vault locked. Unlock to view, edit or fill passwords."
+  },
+  "vaultIsUnlocked": {
+    "message": "Vault unlocked until you close the browser or lock it."
+  },
+  "vaultCreate": {
+    "message": "Create master password"
+  },
+  "vaultCreateText": {
+    "message": "Your passwords are encrypted (AES-256) with this master password. If you forget it, saved passwords cannot be recovered."
+  },
+  "vaultMaster": {
+    "message": "Master password"
+  },
+  "vaultNewMaster": {
+    "message": "New master password"
+  },
+  "vaultConfirm": {
+    "message": "Confirm"
+  },
+  "vaultTooShort": {
+    "message": "Use at least 6 characters"
+  },
+  "vaultMismatch": {
+    "message": "Passwords do not match"
+  },
+  "vaultWrong": {
+    "message": "Wrong password"
+  },
+  "vaultCreated": {
+    "message": "Master password created"
+  },
+  "vaultUnlock": {
+    "message": "Unlock"
+  },
+  "vaultUnlocked": {
+    "message": "Vault unlocked"
+  },
+  "vaultLockNow": {
+    "message": "Lock"
+  },
+  "vaultLocked": {
+    "message": "Vault locked"
+  },
+  "vaultChange": {
+    "message": "Change master password"
+  },
+  "vaultChanged": {
+    "message": "Master password changed"
+  },
+  "vaultRemove": {
+    "message": "Remove vault"
+  },
+  "vaultRemoveConfirm": {
+    "message": "Removes the master password and DELETES all saved passwords. Continue?"
+  },
+  "vaultRemoved": {
+    "message": "Vault removed"
+  },
+  "fillTitle": {
+    "message": "Filling"
+  },
+  "highlight": {
+    "message": "Highlight filled fields"
+  },
+  "shortcut": {
+    "message": "Keyboard shortcut"
+  },
+  "shortcutNone": {
+    "message": "No shortcut set"
+  },
+  "change": {
+    "message": "Change"
+  },
+  "customTitle": {
+    "message": "Custom fields"
+  },
+  "customLabelPh": {
+    "message": "Name (e.g. RG)"
+  },
+  "customPatternsPh": {
+    "message": "Keywords: rg, identity"
+  },
+  "customHint": {
+    "message": "Keywords are matched against field labels, names and placeholders."
+  },
+  "customEmpty": {
+    "message": "No custom fields"
+  },
+  "customAdded": {
+    "message": "Field added"
+  },
+  "customDeleteConfirm": {
+    "message": "Delete field \"$1\" and its values in every profile?"
+  },
+  "add": {
+    "message": "Add"
+  },
+  "sitesTitle": {
+    "message": "Sites"
+  },
+  "sitesEmpty": {
+    "message": "No site rules"
+  },
+  "sitesHint": {
+    "message": "Right-click a field › Fifi-Filler › Map this field as… to teach fields that are not recognized."
+  },
+  "tagAuto": {
+    "message": "auto"
+  },
+  "mappingsCount": {
+    "message": "$1 mapping(s)"
+  },
+  "siteForget": {
+    "message": "Forget site"
+  },
+  "backupTitle": {
+    "message": "Backup"
+  },
+  "backupSub": {
+    "message": "Export your profiles to an encrypted file and import them in another browser."
+  },
+  "export": {
+    "message": "Export"
+  },
+  "import": {
+    "message": "Import"
+  },
+  "backupPass": {
+    "message": "Backup password"
+  },
+  "exportText": {
+    "message": "The file is encrypted with this password."
+  },
+  "exportTextLocked": {
+    "message": "The file is encrypted with this password. The vault is locked, so saved passwords are not included."
+  },
+  "exported": {
+    "message": "Backup exported"
+  },
+  "imported": {
+    "message": "Backup imported"
+  },
+  "importedNoPw": {
+    "message": "Imported. $1 password(s) skipped: unlock or create the vault and import again."
+  },
+  "importInvalid": {
+    "message": "Invalid backup file"
+  },
+  "privacy": {
+    "message": "Privacy"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "clear": {
+    "message": "Clear"
+  },
+  "replace": {
+    "message": "Replace"
+  },
+  "required": {
+    "message": "Required"
+  },
+  "updateAvailable": {
+    "message": "Version $1 is available."
+  },
+  "updateDownload": {
+    "message": "Download"
+  },
+  "updateLater": {
+    "message": "Later"
+  }
+}
