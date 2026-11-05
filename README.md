@@ -2,7 +2,7 @@
 
 > Extensão do Chrome que preenche formulários de cadastro e checkout a partir dos seus perfis. Tem detecção inteligente de campos, busca de CEP, senhas criptografadas e gerador de dados de teste.
 
-![Version](https://img.shields.io/badge/versão-2.0.0-blue)
+![Version](https://img.shields.io/badge/versão-2.0.1-blue)
 ![Manifest](https://img.shields.io/badge/Manifest-v3-green)
 ![CI](https://github.com/raphaeljdev/fifi-filler/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/licença-MIT-lightgrey)

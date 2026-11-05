@@ -121,7 +121,7 @@ a:hover { text-decoration: underline; }
 .save-state { font-size: 11px; font-weight: 500; color: var(--success); }
 
 /* ── Layout ── */
-main { max-height: 470px; overflow-y: auto; }
+main { max-height: 470px; overflow-y: auto; scrollbar-gutter: stable; }
 body.page main { max-height: none; }
 .panel { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 
@@ -257,9 +257,9 @@ kbd {
 .group > summary::after { content: "›"; margin-left: auto; color: var(--muted); transition: transform .2s; font-size: 16px; line-height: 1; }
 .group[open] > summary::after { transform: rotate(90deg); }
 .group > summary svg { color: var(--accent); }
-.group-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px 12px; }
+.group-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 12px 12px; }
 
-.field { grid-column: span 2; display: flex; flex-direction: column; gap: 3px; }
+.field { grid-column: span 2; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .field.half { grid-column: span 1; }
 .field label { font-size: 11.5px; color: var(--muted); font-weight: 500; }
 .input-wrap {
